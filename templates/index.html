@@ -25,10 +25,24 @@ and a submit button to calculate battle results.
       {% endfor %}
     </select>
 
+    <label for="attacker_weapon">Attacker Weapon:</label>
+    <select name="attacker_weapon" id="attacker_weapon">
+      {% for weapon in weapons %}
+      <option value="{{ weapon.name }}">{{ weapon.name }} ({{ weapon.weapon_type }}, Mt: {{ weapon.might }}, {{ weapon.color }}, Rng: {{ weapon.range }})</option>
+      {% endfor %}
+    </select>
+
     <label for="defender">Defender:</label>
     <select name="defender" id="defender">
       {% for unit in units %}
       <option value="{{ unit.name }}">{{ unit.name }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="defender_weapon">Defender Weapon:</label>
+    <select name="defender_weapon" id="defender_weapon">
+      {% for weapon in weapons %}
+      <option value="{{ weapon.name }}">{{ weapon.name }} ({{ weapon.weapon_type }}, Mt: {{ weapon.might }}, {{ weapon.color }}, Rng: {{ weapon.range }})</option>
       {% endfor %}
     </select>
 

@@ -5,6 +5,17 @@ DB_PATH = Path(__file__).parent.parent / "data" / "feh.db"
 SCHEMA_PATH = Path(__file__).parent.parent / "data" / "schema.sql"
 
 class FEHDatabase:
+    def delete_unit(self, name):
+        self.conn.execute("DELETE FROM units WHERE name = ?", (name,))
+        self.conn.commit()
+
+    def delete_weapon(self, name):
+        self.conn.execute("DELETE FROM weapons WHERE name = ?", (name,))
+        self.conn.commit()
+
+    def delete_skill(self, name):
+        self.conn.execute("DELETE FROM skills WHERE name = ?", (name,))
+        self.conn.commit()
     def __init__(self, db_path=DB_PATH):
         self.db_path = str(db_path)
         self.conn = sqlite3.connect(self.db_path)
@@ -43,10 +54,10 @@ class FEHDatabase:
     def add_weapon(self, weapon):
         cur = self.conn.execute(
             """
-            INSERT INTO weapons (name, might, color, range, weapon_type, effective_against, image_url)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO weapons (name, might, color, range, weapon_type, effective_against)
+            VALUES (?, ?, ?, ?, ?, ?)
             """,
-            (weapon["name"], weapon["might"], weapon.get("color"), weapon.get("range"), weapon.get("weapon_type"), weapon.get("effective_against"), weapon.get("image_url"))
+            (weapon["name"], weapon["might"], weapon.get("color"), weapon.get("range"), weapon.get("weapon_type"), weapon.get("effective_against"))
         )
         self.conn.commit()
         return cur.lastrowid

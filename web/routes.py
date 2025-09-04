@@ -59,22 +59,38 @@ def index():
     """
     result = None
     units = get_units_from_db()
+    db = FEHDatabase()
+    weapons = db.get_weapons()
+    db.close()
 
     if request.method == "POST":
         attacker_name = request.form.get("attacker")
         defender_name = request.form.get("defender")
+        attacker_weapon_name = request.form.get("attacker_weapon")
+        defender_weapon_name = request.form.get("defender_weapon")
         attacker = next((u for u in units if u.name == attacker_name), None)
         defender = next((u for u in units if u.name == defender_name), None)
+        attacker_weapon = next((w for w in weapons if w['name'] == attacker_weapon_name), None)
+        defender_weapon = next((w for w in weapons if w['name'] == defender_weapon_name), None)
+        if attacker and attacker_weapon:
+            attacker.weapons = [attacker_weapon]
+            attacker.equipped_weapon = attacker_weapon
+        if defender and defender_weapon:
+            defender.weapons = [defender_weapon]
+            defender.equipped_weapon = defender_weapon
         if attacker and defender:
             dmg = calculate_damage(attacker, defender)
             result = f"{attacker.name} deals {dmg} damage to {defender.name}!"
 
-    return render_template("index.html", units=units, result=result)
+    return render_template("index.html", units=units, weapons=weapons, result=result)
 
 @main.route("/admin", methods=["GET", "POST"])
 def admin():
     message = None
     db = FEHDatabase()
+    units = db.get_units()
+    weapons = db.get_weapons()
+    skills = db.get_skills()
     form_type = request.args.get("type")
     if request.method == "POST":
         if form_type == "unit":
@@ -86,19 +102,18 @@ def admin():
                 "defense": int(request.form.get("defense")),
                 "res": int(request.form.get("res")),
                 "unit_type": request.form.get("unit_type"),
-                "image_url": request.form.get("image_url"),
             }
             db.add_unit(unit)
             message = f"Unit '{unit['name']}' added."
         elif form_type == "weapon":
+            effective_against = request.form.getlist("effective_against")
             weapon = {
                 "name": request.form.get("name"),
                 "might": int(request.form.get("might")),
                 "color": request.form.get("color"),
                 "range": int(request.form.get("range")),
                 "weapon_type": request.form.get("weapon_type"),
-                "effective_against": request.form.get("effective_against"),
-                "image_url": request.form.get("image_url"),
+                "effective_against": ",".join(effective_against),
             }
             db.add_weapon(weapon)
             message = f"Weapon '{weapon['name']}' added."
@@ -111,5 +126,17 @@ def admin():
             }
             db.add_skill(skill)
             message = f"Skill '{skill['name']}' added."
+        elif form_type == "delete":
+            delete_type = request.form.get("delete_type")
+            delete_name = request.form.get("delete_name")
+            if delete_type == "unit":
+                db.delete_unit(delete_name)
+                message = f"Unit '{delete_name}' deleted."
+            elif delete_type == "weapon":
+                db.delete_weapon(delete_name)
+                message = f"Weapon '{delete_name}' deleted."
+            elif delete_type == "skill":
+                db.delete_skill(delete_name)
+                message = f"Skill '{delete_name}' deleted."
     db.close()
-    return render_template("admin.html", message=message)
+    return render_template("admin.html", message=message, units=units, weapons=weapons, skills=skills)
