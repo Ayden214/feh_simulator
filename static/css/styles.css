@@ -1,0 +1,27 @@
+/*
+styles.css
+----------
+Basic styling for the FEH simulator. You can expand this 
+to create a polished, professional theme later.
+*/
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background-color: #f8f8f8;
+  color: #333;
+}
+
+h1 {
+  color: #222;
+}
+
+form {
+  margin-bottom: 20px;
+}
+
+select, button {
+  margin: 5px;
+  padding: 5px;
+  font-size: 14px;
+}

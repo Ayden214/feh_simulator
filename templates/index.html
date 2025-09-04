@@ -1,0 +1,43 @@
+<!--
+index.html
+----------
+Homepage template rendered by Flask.
+Displays dropdowns for selecting attacker and defender units, 
+and a submit button to calculate battle results.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FEH Battle Simulator</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <h1>Fire Emblem Heroes Battle Simulator</h1>
+
+  <!-- Battle Simulation Form -->
+  <form method="POST">
+    <label for="attacker">Attacker:</label>
+    <select name="attacker" id="attacker">
+      {% for unit in units %}
+      <option value="{{ unit.name }}">{{ unit.name }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="defender">Defender:</label>
+    <select name="defender" id="defender">
+      {% for unit in units %}
+      <option value="{{ unit.name }}">{{ unit.name }}</option>
+      {% endfor %}
+    </select>
+
+    <button type="submit">Simulate</button>
+  </form>
+
+  <!-- Display Result (if available) -->
+  {% if result %}
+  <p><strong>{{ result }}</strong></p>
+  {% endif %}
+</body>
+</html>
