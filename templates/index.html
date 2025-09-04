@@ -18,6 +18,7 @@ and a submit button to calculate battle results.
 
   <!-- Battle Simulation Form -->
   <form method="POST">
+
     <label for="attacker">Attacker:</label>
     <select name="attacker" id="attacker">
       {% for unit in units %}
@@ -32,26 +33,151 @@ and a submit button to calculate battle results.
       {% endfor %}
     </select>
 
-    <label for="defender">Defender:</label>
-    <select name="defender" id="defender">
-      {% for unit in units %}
-      <option value="{{ unit.name }}">{{ unit.name }}</option>
+    <label for="attacker_assist">Attacker Assist:</label>
+    <select name="attacker_assist" id="attacker_assist">
+      {% for skill in skills if skill.skill_type == 'Assist' %}
+      <option value="{{ skill.name }}">{{ skill.name }}</option>
       {% endfor %}
     </select>
 
-    <label for="defender_weapon">Defender Weapon:</label>
-    <select name="defender_weapon" id="defender_weapon">
-      {% for weapon in weapons %}
-      <option value="{{ weapon.name }}">{{ weapon.name }} ({{ weapon.weapon_type }}, Mt: {{ weapon.might }}, {{ weapon.color }}, Rng: {{ weapon.range }})</option>
-      {% endfor %}
-    </select>
+    <label for="attacker_special">Attacker Special:</label>
+    <!-- Battle Simulation Form -->
+    <form method="POST">
+      <div style="display: flex; gap: 40px;">
+        <!-- Attacker Column -->
+        <div style="flex: 1;">
+          <h2>Attacker</h2>
+          <label for="attacker">Unit:</label>
+          <select name="attacker" id="attacker">
+            {% for unit in units %}
+            <option value="{{ unit.name }}">{{ unit.name }}</option>
+            {% endfor %}
+          </select>
 
-    <button type="submit">Simulate</button>
-  </form>
+          <label for="attacker_weapon">Weapon:</label>
+          <select name="attacker_weapon" id="attacker_weapon">
+            {% for weapon in weapons %}
+            <option value="{{ weapon.name }}">{{ weapon.name }} ({{ weapon.weapon_type }}, Mt: {{ weapon.might }}, {{ weapon.color }}, Rng: {{ weapon.range }})</option>
+            {% endfor %}
+          </select>
 
-  <!-- Display Result (if available) -->
-  {% if result %}
-  <p><strong>{{ result }}</strong></p>
-  {% endif %}
-</body>
-</html>
+          <label for="attacker_assist">Assist:</label>
+          <select name="attacker_assist" id="attacker_assist">
+            {% for skill in skills if skill.skill_type == 'Assist' %}
+            <option value="{{ skill.name }}">{{ skill.name }}</option>
+            {% endfor %}
+          </select>
+
+          <label for="attacker_special">Special:</label>
+          <select name="attacker_special" id="attacker_special">
+            {% for skill in skills if skill.skill_type == 'Special' %}
+            <option value="{{ skill.name }}">{{ skill.name }}</option>
+            {% endfor %}
+          </select>
+
+          <label for="attacker_a">A Slot:</label>
+          <select name="attacker_a" id="attacker_a">
+            {% for skill in skills if skill.skill_type == 'A' %}
+            <option value="{{ skill.name }}">{{ skill.name }}</option>
+            {% endfor %}
+          </select>
+
+          <label for="attacker_b">B Slot:</label>
+          <select name="attacker_b" id="attacker_b">
+            {% for skill in skills if skill.skill_type == 'B' %}
+            <option value="{{ skill.name }}">{{ skill.name }}</option>
+            {% endfor %}
+          </select>
+
+          <label for="attacker_c">C Slot:</label>
+          <select name="attacker_c" id="attacker_c">
+            {% for skill in skills if skill.skill_type == 'C' %}
+            <option value="{{ skill.name }}">{{ skill.name }}</option>
+            {% endfor %}
+          </select>
+
+          <label for="attacker_seal">Seal:</label>
+          <select name="attacker_seal" id="attacker_seal">
+            {% for skill in skills if skill.skill_type == 'Seal' %}
+            <option value="{{ skill.name }}">{{ skill.name }}</option>
+            {% endfor %}
+          </select>
+
+          <label for="attacker_x">X Slot:</label>
+          <select name="attacker_x" id="attacker_x">
+            {% for skill in skills if skill.skill_type == 'X' %}
+            <option value="{{ skill.name }}">{{ skill.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Defender Column -->
+        <div style="flex: 1;">
+          <h2>Defender</h2>
+          <label for="defender">Unit:</label>
+          <select name="defender" id="defender">
+            {% for unit in units %}
+            <option value="{{ unit.name }}">{{ unit.name }}</option>
+            {% endfor %}
+          </select>
+
+          <label for="defender_weapon">Weapon:</label>
+          <select name="defender_weapon" id="defender_weapon">
+            {% for weapon in weapons %}
+            <option value="{{ weapon.name }}">{{ weapon.name }} ({{ weapon.weapon_type }}, Mt: {{ weapon.might }}, {{ weapon.color }}, Rng: {{ weapon.range }})</option>
+            {% endfor %}
+          </select>
+
+          <label for="defender_assist">Assist:</label>
+          <select name="defender_assist" id="defender_assist">
+            {% for skill in skills if skill.skill_type == 'Assist' %}
+            <option value="{{ skill.name }}">{{ skill.name }}</option>
+            {% endfor %}
+          </select>
+
+          <label for="defender_special">Special:</label>
+          <select name="defender_special" id="defender_special">
+            {% for skill in skills if skill.skill_type == 'Special' %}
+            <option value="{{ skill.name }}">{{ skill.name }}</option>
+            {% endfor %}
+          </select>
+
+          <label for="defender_a">A Slot:</label>
+          <select name="defender_a" id="defender_a">
+            {% for skill in skills if skill.skill_type == 'A' %}
+            <option value="{{ skill.name }}">{{ skill.name }}</option>
+            {% endfor %}
+          </select>
+
+          <label for="defender_b">B Slot:</label>
+          <select name="defender_b" id="defender_b">
+            {% for skill in skills if skill.skill_type == 'B' %}
+            <option value="{{ skill.name }}">{{ skill.name }}</option>
+            {% endfor %}
+          </select>
+
+          <label for="defender_c">C Slot:</label>
+          <select name="defender_c" id="defender_c">
+            {% for skill in skills if skill.skill_type == 'C' %}
+            <option value="{{ skill.name }}">{{ skill.name }}</option>
+            {% endfor %}
+          </select>
+
+          <label for="defender_seal">Seal:</label>
+          <select name="defender_seal" id="defender_seal">
+            {% for skill in skills if skill.skill_type == 'Seal' %}
+            <option value="{{ skill.name }}">{{ skill.name }}</option>
+            {% endfor %}
+          </select>
+
+          <label for="defender_x">X Slot:</label>
+          <select name="defender_x" id="defender_x">
+            {% for skill in skills if skill.skill_type == 'X' %}
+            <option value="{{ skill.name }}">{{ skill.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <br>
+      <button type="submit">Simulate</button>
+    </form>

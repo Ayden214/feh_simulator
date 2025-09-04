@@ -61,6 +61,7 @@ def index():
     units = get_units_from_db()
     db = FEHDatabase()
     weapons = db.get_weapons()
+    skills = db.get_skills()
     db.close()
 
     if request.method == "POST":
@@ -72,6 +73,21 @@ def index():
         defender = next((u for u in units if u.name == defender_name), None)
         attacker_weapon = next((w for w in weapons if w['name'] == attacker_weapon_name), None)
         defender_weapon = next((w for w in weapons if w['name'] == defender_weapon_name), None)
+        # Skill slots
+        skill_slots = ['assist', 'special', 'a', 'b', 'c', 'seal', 'x']
+        for slot in skill_slots:
+            attacker_skill_name = request.form.get(f'attacker_{slot}')
+            defender_skill_name = request.form.get(f'defender_{slot}')
+            attacker_skill = next((s for s in skills if s['name'] == attacker_skill_name), None)
+            defender_skill = next((s for s in skills if s['name'] == defender_skill_name), None)
+            if attacker and attacker_skill:
+                if not hasattr(attacker, 'skills'):
+                    attacker.skills = {}
+                attacker.skills[slot] = attacker_skill
+            if defender and defender_skill:
+                if not hasattr(defender, 'skills'):
+                    defender.skills = {}
+                defender.skills[slot] = defender_skill
         if attacker and attacker_weapon:
             attacker.weapons = [attacker_weapon]
             attacker.equipped_weapon = attacker_weapon
@@ -82,7 +98,7 @@ def index():
             dmg = calculate_damage(attacker, defender)
             result = f"{attacker.name} deals {dmg} damage to {defender.name}!"
 
-    return render_template("index.html", units=units, weapons=weapons, result=result)
+    return render_template("index.html", units=units, weapons=weapons, skills=skills, result=result)
 
 @main.route("/admin", methods=["GET", "POST"])
 def admin():
