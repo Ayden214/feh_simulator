@@ -1,40 +1,68 @@
 """
 units.py
 --------
-Defines core data structures for units (heroes) in Fire Emblem Heroes.
-Each Unit object holds stats, weapon details, and attributes.
+Now includes Weapon class so units can switch weapons dynamically.
 """
+
+class Weapon:
+    """
+    Represents a weapon in Fire Emblem Heroes.
+
+    Attributes:
+        name (str): Weapon name.
+        might (int): Attack power of the weapon.
+        color (str): Weapon color (red, blue, green, colorless).
+        range (int): Weapon range (1 for melee, 2 for ranged).
+    """
+    def __init__(self, name, might, color, range=1):
+        self.name = name
+        self.might = might
+        self.color = color
+        self.range = range
+
 
 class Unit:
     """
     Represents a hero/unit in Fire Emblem Heroes.
 
     Attributes:
-        name (str): Unit's display name.
-        hp (int): Hit Points (max HP).
-        atk (int): Base Attack stat.
-        spd (int): Speed stat (affects follow-ups).
+        name (str): Unit's name.
+        hp (int): Max hit points.
+        atk (int): Base attack stat.
+        spd (int): Speed stat.
         defense (int): Defense stat.
         res (int): Resistance stat.
-        weapon_mt (int): Weapon might (attack power of weapon).
-        weapon_color (str): Color type (red, blue, green, colorless).
+        weapons (list[Weapon]): List of possible weapons.
+        equipped_weapon (Weapon): Currently equipped weapon.
     """
-    def __init__(self, name, hp, atk, spd, defense, res, weapon_mt=0, weapon_color=None):
+    def __init__(self, name, hp, atk, spd, defense, res, weapons=None):
         self.name = name
         self.hp = hp
         self.atk = atk
         self.spd = spd
         self.defense = defense
         self.res = res
-        self.weapon_mt = weapon_mt
-        self.weapon_color = weapon_color
+        self.weapons = weapons if weapons else []
+        self.equipped_weapon = self.weapons[0] if self.weapons else None
+
+    def equip_weapon(self, weapon_name):
+        """
+        Equip a weapon by its name.
+
+        Args:
+            weapon_name (str): Name of the weapon to equip.
+        """
+        for w in self.weapons:
+            if w.name == weapon_name:
+                self.equipped_weapon = w
+                return True
+        return False
 
     def effective_attack(self):
         """
-        Calculate the effective attack stat by adding base attack
-        to weapon might (ignores skills and bonuses for now).
-
+        Calculate attack stat with equipped weapon.
         Returns:
-            int: Total attack stat.
+            int: Total attack value.
         """
-        return self.atk + self.weapon_mt
+        weapon_might = self.equipped_weapon.might if self.equipped_weapon else 0
+        return self.atk + weapon_might
