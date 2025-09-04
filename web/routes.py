@@ -110,6 +110,9 @@ def admin():
     form_type = request.args.get("type")
     if request.method == "POST":
         if form_type == "unit":
+            superboons = request.form.get("superboons", "")
+            superbanes = request.form.get("superbanes", "")
+            exclusive_skills = request.form.get("exclusive_skills", "")
             unit = {
                 "name": request.form.get("name"),
                 "hp": int(request.form.get("hp")),
@@ -117,7 +120,12 @@ def admin():
                 "spd": int(request.form.get("spd")),
                 "defense": int(request.form.get("defense")),
                 "res": int(request.form.get("res")),
+                "superboons": [s.strip() for s in superboons.split(",") if s.strip()],
+                "superbanes": [s.strip() for s in superbanes.split(",") if s.strip()],
+                "exclusive_skills": [s.strip() for s in exclusive_skills.split(",") if s.strip()],
+                "image_url": request.form.get("image_url"),
                 "unit_type": request.form.get("unit_type"),
+                "weapon_type": request.form.get("weapon_type"),
             }
             db.add_unit(unit)
             message = f"Unit '{unit['name']}' added."
