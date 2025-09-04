@@ -1,0 +1,49 @@
+<!-- admin.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FEH Admin Panel</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <h1>Admin: Add Units, Weapons, Skills</h1>
+  <h2>Add Unit</h2>
+  <form method="POST" action="/admin?type=unit">
+    <input name="name" placeholder="Name" required>
+    <input name="hp" type="number" placeholder="HP" required>
+    <input name="atk" type="number" placeholder="Atk" required>
+    <input name="spd" type="number" placeholder="Spd" required>
+    <input name="defense" type="number" placeholder="Def" required>
+    <input name="res" type="number" placeholder="Res" required>
+    <input name="unit_type" placeholder="Type (infantry, armor, etc)">
+    <input name="image_url" placeholder="Image URL">
+    <button type="submit">Add Unit</button>
+  </form>
+
+  <h2>Add Weapon</h2>
+  <form method="POST" action="/admin?type=weapon">
+    <input name="name" placeholder="Name" required>
+    <input name="might" type="number" placeholder="Might" required>
+    <input name="color" placeholder="Color (red, blue, etc)">
+    <input name="range" type="number" placeholder="Range" required>
+    <input name="weapon_type" placeholder="Type (sword, tome, etc)">
+    <input name="effective_against" placeholder="Effective Against (comma separated)">
+    <input name="image_url" placeholder="Image URL">
+    <button type="submit">Add Weapon</button>
+  </form>
+
+  <h2>Add Skill</h2>
+  <form method="POST" action="/admin?type=skill">
+    <input name="name" placeholder="Name" required>
+    <input name="description" placeholder="Description">
+    <input name="skill_type" placeholder="Type (special, passive, etc)">
+    <input name="effect_json" placeholder="Effect JSON">
+    <button type="submit">Add Skill</button>
+  </form>
+
+  {% if message %}
+  <p><strong>{{ message }}</strong></p>
+  {% endif %}
+</body>
+</html>
