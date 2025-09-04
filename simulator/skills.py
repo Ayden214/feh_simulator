@@ -1,5 +1,5 @@
 class Skill:
-    def __init__(self, name, skill_type, description="", effect_json=None, movement_restrictions=None, weapon_restrictions=None, refinable=False):
+    def __init__(self, name, skill_type, description="", effect_json=None, movement_restrictions=None, weapon_restrictions=None, refinable=False, effects=None):
         """
         Args:
             name (str): Name of the skill.
@@ -8,14 +8,17 @@ class Skill:
             effect_json (dict or str): Structured effect data (for advanced logic).
             movement_restrictions (list[str]): Allowed movement types (e.g. ["infantry", "armor"])
             weapon_restrictions (list[str]): Allowed weapon types (e.g. ["Sword", "Tome"])
+            refinable (bool): Whether the skill can be refined.
+            effects (list[callable]): List of effect functions to apply during simulation.
         """
-    self.name = name
-    self.skill_type = skill_type
-    self.description = description
-    self.effect_json = effect_json if effect_json is not None else {}
-    self.movement_restrictions = movement_restrictions if movement_restrictions is not None else []
-    self.weapon_restrictions = weapon_restrictions if weapon_restrictions is not None else []
-    self.refinable = refinable
+        self.name = name
+        self.skill_type = skill_type
+        self.description = description
+        self.effect_json = effect_json if effect_json is not None else {}
+        self.movement_restrictions = movement_restrictions if movement_restrictions is not None else []
+        self.weapon_restrictions = weapon_restrictions if weapon_restrictions is not None else []
+        self.refinable = refinable
+        self.effects = effects if effects is not None else []
 
     def is_usable_by(self, unit_movement, unit_weapon_type):
         """
@@ -26,6 +29,14 @@ class Skill:
         if self.weapon_restrictions and unit_weapon_type not in self.weapon_restrictions:
             return False
         return True
+
+    def apply_effects(self, context):
+        """
+        Apply all skill effects to the simulation context.
+        Each effect should be a function that takes the context and modifies it.
+        """
+        for effect in self.effects:
+            effect(context)
 
     def __repr__(self):
         return f"<Skill {self.name} ({self.skill_type})>"

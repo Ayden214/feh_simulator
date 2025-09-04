@@ -29,15 +29,15 @@ class FEHDatabase:
         self.conn.commit()
 
     def get_units(self):
-        cur = self.conn.execute("SELECT * FROM units")
+        cur = self.conn.execute("SELECT * FROM units ORDER BY name COLLATE NOCASE ASC")
         return [dict(row) for row in cur.fetchall()]
 
     def get_weapons(self):
-        cur = self.conn.execute("SELECT * FROM weapons")
+        cur = self.conn.execute("SELECT * FROM weapons ORDER BY name COLLATE NOCASE ASC")
         return [dict(row) for row in cur.fetchall()]
 
     def get_skills(self):
-        cur = self.conn.execute("SELECT * FROM skills")
+        cur = self.conn.execute("SELECT * FROM skills ORDER BY name COLLATE NOCASE ASC")
         return [dict(row) for row in cur.fetchall()]
 
     def add_unit(self, unit):

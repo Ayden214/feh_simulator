@@ -1,3 +1,18 @@
+def unit_to_dict(u):
+    return {
+        'name': u.name,
+        'hp': u.hp,
+        'atk': u.atk,
+        'spd': u.spd,
+        'defense': u.defense,
+        'res': u.res,
+        'superboons': u.superboons,
+        'superbanes': u.superbanes,
+        'exclusive_skills': u.exclusive_skills,
+        'image_url': u.image_url,
+        'unit_type': u.unit_type,
+        'weapon_type': u.weapon_type
+    }
 """
 routes.py
 ---------
@@ -36,10 +51,15 @@ def get_units_from_db():
             spd=u['spd'],
             defense=u['defense'],
             res=u['res'],
-            weapons=[]
+            superboons=u.get('superboons', []),
+            superbanes=u.get('superbanes', []),
+            exclusive_skills=u.get('exclusive_skills', []),
+            image_url=u.get('image_url', ''),
+            unit_type=u.get('unit_type', ''),
+            weapon_type=u.get('weapon_type', '')
         )
+        # Attach weapon info if available
         if weapon:
-            unit_obj.weapons.append(weapon)
             unit_obj.equipped_weapon = weapon
         unit_objs.append(unit_obj)
     return unit_objs
@@ -59,6 +79,8 @@ def index():
     """
     result = None
     units = get_units_from_db()
+    # Convert Unit objects to dicts for template (for tojson)
+    units_for_template = [unit_to_dict(u) for u in units]
     db = FEHDatabase()
     weapons = db.get_weapons()
     skills = db.get_skills()
@@ -88,17 +110,30 @@ def index():
                 if not hasattr(defender, 'skills'):
                     defender.skills = {}
                 defender.skills[slot] = defender_skill
-        if attacker and attacker_weapon:
+        from simulator.weapon import Weapon
+        if attacker and attacker_weapon and attacker_weapon != 'None':
             attacker.weapons = [attacker_weapon]
-            attacker.equipped_weapon = attacker_weapon
-        if defender and defender_weapon:
+            attacker.equipped_weapon = Weapon(
+                name=attacker_weapon['name'],
+                might=attacker_weapon['might'],
+                color=attacker_weapon.get('color'),
+                range=attacker_weapon.get('range', 1),
+                weapon_type=attacker_weapon.get('weapon_type')
+            )
+        if defender and defender_weapon and defender_weapon != 'None':
             defender.weapons = [defender_weapon]
-            defender.equipped_weapon = defender_weapon
+            defender.equipped_weapon = Weapon(
+                name=defender_weapon['name'],
+                might=defender_weapon['might'],
+                color=defender_weapon.get('color'),
+                range=defender_weapon.get('range', 1),
+                weapon_type=defender_weapon.get('weapon_type')
+            )
         if attacker and defender:
             dmg = calculate_damage(attacker, defender)
             result = f"{attacker.name} deals {dmg} damage to {defender.name}!"
 
-    return render_template("index.html", units=units, weapons=weapons, skills=skills, result=result)
+    return render_template("index.html", units=units_for_template, weapons=weapons, skills=skills, result=result)
 
 @main.route("/admin", methods=["GET", "POST"])
 def admin():

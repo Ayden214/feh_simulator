@@ -8,72 +8,98 @@ For now, this is a simple damage calculation:
     Damage = max(0, Attacker's Effective ATK - Defender's DEF or RES)
 """
 
+class SimulationContext:
+    def __init__(self, attacker, defender):
+        self.attacker = attacker
+        self.defender = defender
+        self.damage = 0
+        self.log = []
+        # Add other fields as needed (e.g., turn, phase, terrain, etc.)
+
+    def add_log(self, message):
+        self.log.append(message)
+
 def calculate_damage(attacker, defender, weapon_type=None, terrain=None, adaptive_damage=False):
     """
     Calculate FEH battle damage following official structure.
-
-    Args:
-        attacker (Unit): The attacking unit.
-        defender (Unit): The defending unit.
-        weapon_type (str): Weapon type (e.g., 'sword', 'tome', 'staff').
-        terrain (str): Terrain type (e.g., 'defensive', None).
-
-    Returns:
-        int: Final damage dealt (minimum 0).
     """
-    # 1. Visible stats
-    atk = attacker.get_visible_atk()
-    # Adaptive damage: use lower of Def or Res if flag is set
-    if adaptive_damage:
-        defense_stat = min(defender.get_visible_def(), defender.get_visible_res())
-    else:
-        if weapon_type in ['tome', 'dragon', 'staff']:
-            defense_stat = defender.get_visible_res()
-        else:
-            defense_stat = defender.get_visible_def()
+    context = SimulationContext(attacker, defender)
 
-    # Moonbow: ignore 30% of foe's Def/Res
+    # Apply weapon effects (attacker)
+    if hasattr(attacker, 'equipped_weapon') and attacker.equipped_weapon:
+        attacker.equipped_weapon.apply_effects(context)
+    # Apply skill effects (attacker)
+    if hasattr(attacker, 'equipped_skills'):
+        for skill in attacker.equipped_skills.values():
+            if skill:
+                skill.apply_effects(context)
+    # Apply weapon effects (defender)
+    if hasattr(defender, 'equipped_weapon') and defender.equipped_weapon:
+        defender.equipped_weapon.apply_effects(context)
+    # Apply skill effects (defender)
+    if hasattr(defender, 'equipped_skills'):
+        for skill in defender.equipped_skills.values():
+            if skill:
+                skill.apply_effects(context)
+
+
+    # 1. Visible stats
+    atk = attacker.atk
+    # Weapon might
+    if hasattr(attacker, 'equipped_weapon') and attacker.equipped_weapon:
+        atk += attacker.equipped_weapon.might
+
+    # 2. Defensive stat
+    if adaptive_damage:
+        defense_stat = min(defender.defense, defender.res)
+    else:
+        # Use res for tome, dragon, staff; else defense
+        wtype = weapon_type or (attacker.equipped_weapon.weapon_type if hasattr(attacker, 'equipped_weapon') and attacker.equipped_weapon else None)
+        if wtype and wtype.lower() in ['tome', 'dragon', 'staff']:
+            defense_stat = defender.res
+        else:
+            defense_stat = defender.defense
+
+    # 3. Weapon triangle advantage (simple version)
+    advantage_mod = 0
+    if hasattr(attacker, 'equipped_weapon') and attacker.equipped_weapon and hasattr(defender, 'equipped_weapon') and defender.equipped_weapon:
+        att_color = getattr(attacker.equipped_weapon, 'color', None)
+        def_color = getattr(defender.equipped_weapon, 'color', None)
+        triangle = {('red', 'green'): 0.2, ('green', 'blue'): 0.2, ('blue', 'red'): 0.2,
+                    ('green', 'red'): -0.2, ('blue', 'green'): -0.2, ('red', 'blue'): -0.2}
+        advantage_mod = triangle.get((att_color, def_color), 0)
+    atk = int(atk * (1 + advantage_mod))
+
+    # 4. Effectiveness (stub: always 0)
+    effective_mod = 0
+    atk = int(atk * (1 + effective_mod))
+
+    # 5. Terrain
+    terrain_mod = 0.3 if terrain == 'defensive' or getattr(defender, 'on_defensive_tile', False) else 0.0
+    defense_stat = int(defense_stat * (1 + terrain_mod))
+
+    # 6. Staff modifier (stub: always 1)
+    staff_mod = 1
+
+    # 7. Special damage (stub: always 0)
+    special_damage = 0
+    # Example: Moonbow
     if getattr(attacker, 'special', None) == 'Moonbow':
         defense_stat = int(defense_stat * 0.7)
 
-    # 2. Weapon triangle advantage
-    advantage_mod = attacker.get_advantage_mod(defender)
-    atk = apply_advantage_mod(atk, advantage_mod)
+    # 8. Fixed damage (stub: always 0)
+    fixed_damage = 0
 
-    # 3. Effectiveness
-    effective_mod = attacker.get_effective_mod(defender)
-    atk = apply_effective_mod(atk, effective_mod)
+    # 9. Percent reduction (stub: always 0)
+    percent_reduction = 0
+    # 10. Fixed reduction (stub: always 0)
+    fixed_reduction = 0
 
-    # 4. Terrain (prefer Unit flag if present)
-    terrain_mod = get_terrain_mod(terrain)
-    if hasattr(defender, 'on_defensive_tile') and defender.on_defensive_tile:
-        terrain_mod = 0.3
-    defense_stat = apply_terrain_mod(defense_stat, terrain_mod)
-
-    # 5. Staff modifier
-    staff_mod = attacker.get_staff_mod()
-
-    # 6. Base damage
-    base_damage = atk - defense_stat
-
-    # 7. Special damage
-    special_damage = attacker.get_special_damage(base_damage)
-    base_damage += special_damage
-
-    # 8. Fixed damage
-    fixed_damage = attacker.get_fixed_damage(defender)
-    base_damage += fixed_damage
-
-    # 9. Percent reduction
-    percent_reduction = defender.get_percent_reduction()
-    base_damage = apply_percent_reduction(base_damage, percent_reduction)
-
-    # 10. Fixed reduction
-    fixed_reduction = defender.get_fixed_reduction()
-    base_damage -= fixed_reduction
-
-    # 11. Staff mod (applied after all additions/reductions)
+    # 11. Calculate base damage
+    base_damage = atk - defense_stat + special_damage + fixed_damage
     base_damage = int(base_damage * staff_mod)
+    base_damage = int(base_damage * (1 - percent_reduction))
+    base_damage -= fixed_reduction
 
     # 12. Floor/ceil and set negative to zero
     damage = max(0, int(base_damage))
@@ -82,7 +108,11 @@ def calculate_damage(attacker, defender, weapon_type=None, terrain=None, adaptiv
     # attacker.apply_healing(damage)
     # attacker.apply_recoil(damage)
 
-    return damage
+    # At the end, set context.damage and return it
+    context.damage = damage
+
+    # For demonstration, just return context.damage and context.log
+    return context.damage, context.log
 
 # Helper functions (to be implemented)
 def apply_advantage_mod(atk, mod):

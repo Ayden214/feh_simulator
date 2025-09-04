@@ -14,170 +14,205 @@ and a submit button to calculate battle results.
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
+
   <h1>Fire Emblem Heroes Battle Simulator</h1>
-
-  <!-- Battle Simulation Form -->
   <form method="POST">
+    <div style="display: flex; gap: 40px;">
+      <!-- Attacker Column -->
+      <div style="flex: 1;">
+        <h2>Attacker</h2>
+        <label for="attacker">Unit:</label>
+        <select name="attacker" id="attacker" onchange="showUnitInfo('attacker', this.value)">
+          <option value="None" {% if request.form.get('attacker', 'None') == 'None' %}selected{% endif %}>None</option>
+          {% for unit in units %}
+          <option value="{{ unit.name }}" {% if request.form.get('attacker', 'None') == unit.name %}selected{% endif %}>{{ unit.name }}</option>
+          {% endfor %}
+        </select>
+        <div id="attacker-info" class="unit-info"></div>
 
-    <label for="attacker">Attacker:</label>
-    <select name="attacker" id="attacker">
-      {% for unit in units %}
-      <option value="{{ unit.name }}">{{ unit.name }}</option>
-      {% endfor %}
-    </select>
+        <label for="attacker_weapon">Weapon:</label>
+        <select name="attacker_weapon" id="attacker_weapon">
+          <option value="None" {% if request.form.get('attacker_weapon', 'None') == 'None' %}selected{% endif %}>None</option>
+          {% for weapon in weapons %}
+          <option value="{{ weapon.name }}" {% if request.form.get('attacker_weapon', 'None') == weapon.name %}selected{% endif %}>{{ weapon.name }} ({{ weapon.weapon_type }}, Mt: {{ weapon.might }}, {{ weapon.color }}, Rng: {{ weapon.range }})</option>
+          {% endfor %}
+        </select>
 
-    <label for="attacker_weapon">Attacker Weapon:</label>
-    <select name="attacker_weapon" id="attacker_weapon">
-      {% for weapon in weapons %}
-      <option value="{{ weapon.name }}">{{ weapon.name }} ({{ weapon.weapon_type }}, Mt: {{ weapon.might }}, {{ weapon.color }}, Rng: {{ weapon.range }})</option>
-      {% endfor %}
-    </select>
+        <label for="attacker_assist">Assist:</label>
+        <select name="attacker_assist" id="attacker_assist">
+          <option value="None" {% if request.form.get('attacker_assist', 'None') == 'None' %}selected{% endif %}>None</option>
+          {% for skill in skills if skill.skill_type == 'Assist' %}
+          <option value="{{ skill.name }}" {% if request.form.get('attacker_assist', 'None') == skill.name %}selected{% endif %}>{{ skill.name }}</option>
+          {% endfor %}
+        </select>
 
-    <label for="attacker_assist">Attacker Assist:</label>
-    <select name="attacker_assist" id="attacker_assist">
-      {% for skill in skills if skill.skill_type == 'Assist' %}
-      <option value="{{ skill.name }}">{{ skill.name }}</option>
-      {% endfor %}
-    </select>
+        <label for="attacker_special">Special:</label>
+        <select name="attacker_special" id="attacker_special">
+          <option value="None" {% if request.form.get('attacker_special', 'None') == 'None' %}selected{% endif %}>None</option>
+          {% for skill in skills if skill.skill_type == 'Special' %}
+          <option value="{{ skill.name }}" {% if request.form.get('attacker_special', 'None') == skill.name %}selected{% endif %}>{{ skill.name }}</option>
+          {% endfor %}
+        </select>
 
-    <label for="attacker_special">Attacker Special:</label>
-    <!-- Battle Simulation Form -->
-    <form method="POST">
-      <div style="display: flex; gap: 40px;">
-        <!-- Attacker Column -->
-        <div style="flex: 1;">
-          <h2>Attacker</h2>
-          <label for="attacker">Unit:</label>
-          <select name="attacker" id="attacker">
-            {% for unit in units %}
-            <option value="{{ unit.name }}">{{ unit.name }}</option>
-            {% endfor %}
-          </select>
+        <label for="attacker_a">A Slot:</label>
+        <select name="attacker_a" id="attacker_a">
+          <option value="None" {% if request.form.get('attacker_a', 'None') == 'None' %}selected{% endif %}>None</option>
+          {% for skill in skills if skill.skill_type == 'A' %}
+          <option value="{{ skill.name }}" {% if request.form.get('attacker_a', 'None') == skill.name %}selected{% endif %}>{{ skill.name }}</option>
+          {% endfor %}
+        </select>
 
-          <label for="attacker_weapon">Weapon:</label>
-          <select name="attacker_weapon" id="attacker_weapon">
-            {% for weapon in weapons %}
-            <option value="{{ weapon.name }}">{{ weapon.name }} ({{ weapon.weapon_type }}, Mt: {{ weapon.might }}, {{ weapon.color }}, Rng: {{ weapon.range }})</option>
-            {% endfor %}
-          </select>
+        <label for="attacker_b">B Slot:</label>
+        <select name="attacker_b" id="attacker_b">
+          <option value="None" {% if request.form.get('attacker_b', 'None') == 'None' %}selected{% endif %}>None</option>
+          {% for skill in skills if skill.skill_type == 'B' %}
+          <option value="{{ skill.name }}" {% if request.form.get('attacker_b', 'None') == skill.name %}selected{% endif %}>{{ skill.name }}</option>
+          {% endfor %}
+        </select>
 
-          <label for="attacker_assist">Assist:</label>
-          <select name="attacker_assist" id="attacker_assist">
-            {% for skill in skills if skill.skill_type == 'Assist' %}
-            <option value="{{ skill.name }}">{{ skill.name }}</option>
-            {% endfor %}
-          </select>
+        <label for="attacker_c">C Slot:</label>
+        <select name="attacker_c" id="attacker_c">
+          <option value="None" {% if request.form.get('attacker_c', 'None') == 'None' %}selected{% endif %}>None</option>
+          {% for skill in skills if skill.skill_type == 'C' %}
+          <option value="{{ skill.name }}" {% if request.form.get('attacker_c', 'None') == skill.name %}selected{% endif %}>{{ skill.name }}</option>
+          {% endfor %}
+        </select>
 
-          <label for="attacker_special">Special:</label>
-          <select name="attacker_special" id="attacker_special">
-            {% for skill in skills if skill.skill_type == 'Special' %}
-            <option value="{{ skill.name }}">{{ skill.name }}</option>
-            {% endfor %}
-          </select>
+        <label for="attacker_seal">Seal:</label>
+        <select name="attacker_seal" id="attacker_seal">
+          <option value="None" {% if request.form.get('attacker_seal', 'None') == 'None' %}selected{% endif %}>None</option>
+          {% for skill in skills if skill.skill_type == 'Seal' %}
+          <option value="{{ skill.name }}" {% if request.form.get('attacker_seal', 'None') == skill.name %}selected{% endif %}>{{ skill.name }}</option>
+          {% endfor %}
+        </select>
 
-          <label for="attacker_a">A Slot:</label>
-          <select name="attacker_a" id="attacker_a">
-            {% for skill in skills if skill.skill_type == 'A' %}
-            <option value="{{ skill.name }}">{{ skill.name }}</option>
-            {% endfor %}
-          </select>
-
-          <label for="attacker_b">B Slot:</label>
-          <select name="attacker_b" id="attacker_b">
-            {% for skill in skills if skill.skill_type == 'B' %}
-            <option value="{{ skill.name }}">{{ skill.name }}</option>
-            {% endfor %}
-          </select>
-
-          <label for="attacker_c">C Slot:</label>
-          <select name="attacker_c" id="attacker_c">
-            {% for skill in skills if skill.skill_type == 'C' %}
-            <option value="{{ skill.name }}">{{ skill.name }}</option>
-            {% endfor %}
-          </select>
-
-          <label for="attacker_seal">Seal:</label>
-          <select name="attacker_seal" id="attacker_seal">
-            {% for skill in skills if skill.skill_type == 'Seal' %}
-            <option value="{{ skill.name }}">{{ skill.name }}</option>
-            {% endfor %}
-          </select>
-
-          <label for="attacker_x">X Slot:</label>
-          <select name="attacker_x" id="attacker_x">
-            {% for skill in skills if skill.skill_type == 'X' %}
-            <option value="{{ skill.name }}">{{ skill.name }}</option>
-            {% endfor %}
-          </select>
-        </div>
-
-        <!-- Defender Column -->
-        <div style="flex: 1;">
-          <h2>Defender</h2>
-          <label for="defender">Unit:</label>
-          <select name="defender" id="defender">
-            {% for unit in units %}
-            <option value="{{ unit.name }}">{{ unit.name }}</option>
-            {% endfor %}
-          </select>
-
-          <label for="defender_weapon">Weapon:</label>
-          <select name="defender_weapon" id="defender_weapon">
-            {% for weapon in weapons %}
-            <option value="{{ weapon.name }}">{{ weapon.name }} ({{ weapon.weapon_type }}, Mt: {{ weapon.might }}, {{ weapon.color }}, Rng: {{ weapon.range }})</option>
-            {% endfor %}
-          </select>
-
-          <label for="defender_assist">Assist:</label>
-          <select name="defender_assist" id="defender_assist">
-            {% for skill in skills if skill.skill_type == 'Assist' %}
-            <option value="{{ skill.name }}">{{ skill.name }}</option>
-            {% endfor %}
-          </select>
-
-          <label for="defender_special">Special:</label>
-          <select name="defender_special" id="defender_special">
-            {% for skill in skills if skill.skill_type == 'Special' %}
-            <option value="{{ skill.name }}">{{ skill.name }}</option>
-            {% endfor %}
-          </select>
-
-          <label for="defender_a">A Slot:</label>
-          <select name="defender_a" id="defender_a">
-            {% for skill in skills if skill.skill_type == 'A' %}
-            <option value="{{ skill.name }}">{{ skill.name }}</option>
-            {% endfor %}
-          </select>
-
-          <label for="defender_b">B Slot:</label>
-          <select name="defender_b" id="defender_b">
-            {% for skill in skills if skill.skill_type == 'B' %}
-            <option value="{{ skill.name }}">{{ skill.name }}</option>
-            {% endfor %}
-          </select>
-
-          <label for="defender_c">C Slot:</label>
-          <select name="defender_c" id="defender_c">
-            {% for skill in skills if skill.skill_type == 'C' %}
-            <option value="{{ skill.name }}">{{ skill.name }}</option>
-            {% endfor %}
-          </select>
-
-          <label for="defender_seal">Seal:</label>
-          <select name="defender_seal" id="defender_seal">
-            {% for skill in skills if skill.skill_type == 'Seal' %}
-            <option value="{{ skill.name }}">{{ skill.name }}</option>
-            {% endfor %}
-          </select>
-
-          <label for="defender_x">X Slot:</label>
-          <select name="defender_x" id="defender_x">
-            {% for skill in skills if skill.skill_type == 'X' %}
-            <option value="{{ skill.name }}">{{ skill.name }}</option>
-            {% endfor %}
-          </select>
-        </div>
+        <label for="attacker_x">X Slot:</label>
+        <select name="attacker_x" id="attacker_x">
+          <option value="None" {% if request.form.get('attacker_x', 'None') == 'None' %}selected{% endif %}>None</option>
+          {% for skill in skills if skill.skill_type == 'X' %}
+          <option value="{{ skill.name }}" {% if request.form.get('attacker_x', 'None') == skill.name %}selected{% endif %}>{{ skill.name }}</option>
+          {% endfor %}
+        </select>
       </div>
-      <br>
-      <button type="submit">Simulate</button>
-    </form>
+
+      <!-- Defender Column -->
+      <div style="flex: 1;">
+        <h2>Defender</h2>
+        <label for="defender">Unit:</label>
+        <select name="defender" id="defender" onchange="showUnitInfo('defender', this.value)">
+          <option value="None" {% if request.form.get('defender', 'None') == 'None' %}selected{% endif %}>None</option>
+          {% for unit in units %}
+          <option value="{{ unit.name }}" {% if request.form.get('defender', 'None') == unit.name %}selected{% endif %}>{{ unit.name }}</option>
+          {% endfor %}
+        </select>
+        <div id="defender-info" class="unit-info"></div>
+
+        <label for="defender_weapon">Weapon:</label>
+        <select name="defender_weapon" id="defender_weapon">
+          <option value="None" {% if request.form.get('defender_weapon', 'None') == 'None' %}selected{% endif %}>None</option>
+          {% for weapon in weapons %}
+          <option value="{{ weapon.name }}" {% if request.form.get('defender_weapon', 'None') == weapon.name %}selected{% endif %}>{{ weapon.name }} ({{ weapon.weapon_type }}, Mt: {{ weapon.might }}, {{ weapon.color }}, Rng: {{ weapon.range }})</option>
+          {% endfor %}
+        </select>
+
+        <label for="defender_assist">Assist:</label>
+        <select name="defender_assist" id="defender_assist">
+          <option value="None" {% if request.form.get('defender_assist', 'None') == 'None' %}selected{% endif %}>None</option>
+          {% for skill in skills if skill.skill_type == 'Assist' %}
+          <option value="{{ skill.name }}" {% if request.form.get('defender_assist', 'None') == skill.name %}selected{% endif %}>{{ skill.name }}</option>
+          {% endfor %}
+        </select>
+
+        <label for="defender_special">Special:</label>
+        <select name="defender_special" id="defender_special">
+          <option value="None" {% if request.form.get('defender_special', 'None') == 'None' %}selected{% endif %}>None</option>
+          {% for skill in skills if skill.skill_type == 'Special' %}
+          <option value="{{ skill.name }}" {% if request.form.get('defender_special', 'None') == skill.name %}selected{% endif %}>{{ skill.name }}</option>
+          {% endfor %}
+        </select>
+
+        <label for="defender_a">A Slot:</label>
+        <select name="defender_a" id="defender_a">
+          <option value="None" {% if request.form.get('defender_a', 'None') == 'None' %}selected{% endif %}>None</option>
+          {% for skill in skills if skill.skill_type == 'A' %}
+          <option value="{{ skill.name }}" {% if request.form.get('defender_a', 'None') == skill.name %}selected{% endif %}>{{ skill.name }}</option>
+          {% endfor %}
+        </select>
+
+        <label for="defender_b">B Slot:</label>
+        <select name="defender_b" id="defender_b">
+          <option value="None" {% if request.form.get('defender_b', 'None') == 'None' %}selected{% endif %}>None</option>
+          {% for skill in skills if skill.skill_type == 'B' %}
+          <option value="{{ skill.name }}" {% if request.form.get('defender_b', 'None') == skill.name %}selected{% endif %}>{{ skill.name }}</option>
+          {% endfor %}
+        </select>
+
+        <label for="defender_c">C Slot:</label>
+        <select name="defender_c" id="defender_c">
+          <option value="None" {% if request.form.get('defender_c', 'None') == 'None' %}selected{% endif %}>None</option>
+          {% for skill in skills if skill.skill_type == 'C' %}
+          <option value="{{ skill.name }}" {% if request.form.get('defender_c', 'None') == skill.name %}selected{% endif %}>{{ skill.name }}</option>
+          {% endfor %}
+        </select>
+
+        <label for="defender_seal">Seal:</label>
+        <select name="defender_seal" id="defender_seal">
+          <option value="None" {% if request.form.get('defender_seal', 'None') == 'None' %}selected{% endif %}>None</option>
+          {% for skill in skills if skill.skill_type == 'Seal' %}
+          <option value="{{ skill.name }}" {% if request.form.get('defender_seal', 'None') == skill.name %}selected{% endif %}>{{ skill.name }}</option>
+          {% endfor %}
+        </select>
+
+        <label for="defender_x">X Slot:</label>
+        <select name="defender_x" id="defender_x">
+          <option value="None" {% if request.form.get('defender_x', 'None') == 'None' %}selected{% endif %}>None</option>
+          {% for skill in skills if skill.skill_type == 'X' %}
+          <option value="{{ skill.name }}" {% if request.form.get('defender_x', 'None') == skill.name %}selected{% endif %}>{{ skill.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <br>
+    <textarea id="combat-text" readonly style="width:100%;height:120px;font-size:18px;margin-top:20px;resize:none;background:#f9f9f9;border:2px solid #888;">{{ result if result else 'Select options to see combat results.' }}</textarea>
+  </form>
+
+  <script>
+    // Show unit info panel for selected unit
+    const units = {{ units|tojson }};
+    function showUnitInfo(role, unitName) {
+      const unit = units.find(u => u.name === unitName);
+      const infoDiv = document.getElementById(role + '-info');
+      if (!unit) {
+        infoDiv.innerHTML = '';
+        return;
+      }
+      infoDiv.innerHTML = `
+        <div style="border:1px solid #ccc; padding:8px; margin:8px 0; background:#f9f9f9;">
+          ${unit.image_url ? `<img src='${unit.image_url}' alt='${unit.name}' style='max-width:80px;float:right;margin-left:10px;'>` : ''}
+          <strong>${unit.name}</strong><br>
+          <span>HP: ${unit.hp}, Atk: ${unit.atk}, Spd: ${unit.spd}, Def: ${unit.defense}, Res: ${unit.res}</span><br>
+          <span>Movement: ${unit.unit_type}, Weapon: ${unit.weapon_type}</span><br>
+          <span>Superboons: ${unit.superboons && unit.superboons.length ? unit.superboons.join(', ') : 'None'}</span><br>
+          <span>Superbanes: ${unit.superbanes && unit.superbanes.length ? unit.superbanes.join(', ') : 'None'}</span><br>
+          <span>Exclusive Skills: ${unit.exclusive_skills && unit.exclusive_skills.length ? unit.exclusive_skills.join(', ') : 'None'}</span>
+        </div>
+      `;
+    }
+    // Initialize info panels
+    document.addEventListener('DOMContentLoaded', function() {
+      const attackerSelect = document.getElementById('attacker');
+      const defenderSelect = document.getElementById('defender');
+      if (attackerSelect) showUnitInfo('attacker', attackerSelect.value);
+      if (defenderSelect) showUnitInfo('defender', defenderSelect.value);
+      attackerSelect.addEventListener('change', function() { showUnitInfo('attacker', this.value); });
+      defenderSelect.addEventListener('change', function() { showUnitInfo('defender', this.value); });
+
+      // Auto-submit form on any change
+      const form = attackerSelect.closest('form');
+      form.querySelectorAll('select').forEach(sel => {
+        sel.addEventListener('change', function() {
+          form.submit();
+        });
+      });
+    });
+  </script>
