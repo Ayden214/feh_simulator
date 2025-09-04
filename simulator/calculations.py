@@ -32,6 +32,10 @@ def calculate_damage(attacker, defender, weapon_type=None, terrain=None, adaptiv
         else:
             defense_stat = defender.get_visible_def()
 
+    # Moonbow: ignore 30% of foe's Def/Res
+    if getattr(attacker, 'special', None) == 'Moonbow':
+        defense_stat = int(defense_stat * 0.7)
+
     # 2. Weapon triangle advantage
     advantage_mod = attacker.get_advantage_mod(defender)
     atk = apply_advantage_mod(atk, advantage_mod)
@@ -40,8 +44,10 @@ def calculate_damage(attacker, defender, weapon_type=None, terrain=None, adaptiv
     effective_mod = attacker.get_effective_mod(defender)
     atk = apply_effective_mod(atk, effective_mod)
 
-    # 4. Terrain
+    # 4. Terrain (prefer Unit flag if present)
     terrain_mod = get_terrain_mod(terrain)
+    if hasattr(defender, 'on_defensive_tile') and defender.on_defensive_tile:
+        terrain_mod = 0.3
     defense_stat = apply_terrain_mod(defense_stat, terrain_mod)
 
     # 5. Staff modifier
@@ -71,6 +77,11 @@ def calculate_damage(attacker, defender, weapon_type=None, terrain=None, adaptiv
 
     # 12. Floor/ceil and set negative to zero
     damage = max(0, int(base_damage))
+
+    # Hooks for healing/recoil (not implemented)
+    # attacker.apply_healing(damage)
+    # attacker.apply_recoil(damage)
+
     return damage
 
 # Helper functions (to be implemented)
