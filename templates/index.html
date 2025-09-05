@@ -204,8 +204,8 @@ and a submit button to calculate battle results.
         imgDiv.innerHTML = '';
         return;
       }
-      // Only show image in imgDiv
-      imgDiv.innerHTML = unit.image_url ? `<img src='${unit.image_url}' alt='${unit.name}' style='max-width:100%;max-height:220px;border-radius:12px;'>` : '';
+  // Only show image in imgDiv
+  imgDiv.innerHTML = unit.image_url ? `<img src='${unit.image_url}' alt='${unit.name}' width='640' height='750' style='border-radius:12px;'>` : '';
       // Show stats/info in infoDiv
       infoDiv.innerHTML = `
         <div style="border:1px solid #ccc; padding:8px; margin:8px 0; background:#f9f9f9;">

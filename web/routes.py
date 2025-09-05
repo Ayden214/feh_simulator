@@ -254,3 +254,31 @@ def admin_edit_unit(unit_name):
         unit_name = unit["name"]
     db.close()
     return render_template("edit_unit.html", unit=unit, message=message)
+
+@main.route('/admin/weapons')
+def weapon_list():
+    from simulator.data_loader import get_all_weapons
+    weapons = get_all_weapons()
+    return render_template('weapon_list.html', weapons=weapons)
+
+@main.route('/admin/edit/weapon/<name>', methods=['GET', 'POST'])
+def edit_weapon(name):
+    from simulator.data_loader import get_weapon_by_name, update_weapon, get_weapon_types
+    weapon = get_weapon_by_name(name)
+    weapon_types = get_weapon_types()
+    if request.method == 'POST':
+        new_name = request.form['name']
+        might = int(request.form['might'])
+        color = request.form['color']
+        range_ = int(request.form['range'])
+        weapon_type = request.form['weapon_type']
+        effective_against = request.form['effective_against']
+        update_weapon(name, new_name, might, color, range_, weapon_type, effective_against)
+        return redirect(url_for('web.weapon_list'))
+    return render_template('edit_weapon.html', weapon=weapon, weapon_types=weapon_types)
+
+@main.route('/admin/delete/weapon/<name>', methods=['POST'])
+def delete_weapon(name):
+    from simulator.data_loader import delete_weapon
+    delete_weapon(name)
+    return redirect(url_for('web.weapon_list'))

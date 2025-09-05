@@ -8,12 +8,12 @@ to create a polished, professional theme later.
 body {
   font-family: Arial, sans-serif;
   margin: 0;
-  background-color: #f8f8f8;
-  color: #333;
+  background-color: #222326;
+  color: #ffe600;
 }
 
 h1 {
-  color: #222;
+  color: #ffe600;
   font-size: 2.2em;
   margin-top: 32px;
   margin-bottom: 16px;
@@ -21,25 +21,28 @@ h1 {
 
 .feh-flex {
   display: flex;
-  gap: 40px;
+  gap: 8px;
   justify-content: center;
   align-items: flex-start;
 }
 
 .feh-column {
-  background: #fff;
+  background: #222326;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  box-shadow: 0 2px 8px rgba(255,0,0,0.15);
+  border: 2px solid #ff003c;
   padding: 24px 18px 18px 18px;
   min-width: 340px;
   max-width: 400px;
   flex: 1;
+  color: #ffe600;
 }
 
 .feh-header {
   text-align: center;
   font-size: 1.3em;
   margin-bottom: 18px;
+  color: #ffe600;
 }
 
 .feh-hero-img {
@@ -52,16 +55,20 @@ h1 {
   align-items: center;
   justify-content: center;
 }
-}
 .feh-hero-img-left {
-  margin-right: 24px;
+  margin-right: -4px;
   margin-left: 0;
   justify-content: flex-end;
 }
 .feh-hero-img-right {
-  margin-left: 24px;
+  margin-left: -4px;
   margin-right: 0;
   justify-content: flex-start;
+}
+
+/* Flip defender image vertically */
+.feh-hero-img-right img {
+  transform: scaleX(-1);
 }
 
 .feh-group {
@@ -79,13 +86,16 @@ select, button {
   font-size: 15px;
   width: 100%;
   box-sizing: border-box;
+  background: #222326;
+  color: #ffe600;
+  border: 2px solid #ff003c;
 }
 
 textarea#combat-text {
   margin-top: 24px;
   font-size: 1.1em;
   border-radius: 8px;
-  border: 2px solid #888;
-  background: #f9f9f9;
+  border: 2px solid #ff003c;
+  background: #444;
   padding: 12px;
 }

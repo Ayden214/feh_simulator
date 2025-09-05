@@ -38,8 +38,16 @@
     });
   </script>
   <h1>Admin: Add/Delete Units, Weapons, Skills</h1>
-  <h2>Unit Management</h2>
-  <a href="/admin/units">View & Edit All Units</a>
+  <div style="display: flex; gap: 32px; align-items: center; margin-bottom: 18px;">
+    <div>
+      <h2 style="margin-bottom: 8px;">Unit Management</h2>
+      <a href="/admin/units">View & Edit All Units</a>
+    </div>
+    <div>
+      <h2 style="margin-bottom: 8px;">Weapon Management</h2>
+      <a href="/admin/weapons">View & Edit All Weapons</a>
+    </div>
+  </div>
   <h2>Add Unit</h2>
   <form method="POST" action="/admin?type=unit">
     <input name="name" placeholder="Name" required>
@@ -68,12 +76,27 @@
       <option value="Sword">Sword</option>
       <option value="Lance">Lance</option>
       <option value="Axe">Axe</option>
-      <option value="Bow">Bow</option>
-      <option value="Dagger">Dagger</option>
-      <option value="Tome">Tome</option>
       <option value="Staff">Staff</option>
-      <option value="Beast">Beast</option>
-      <option value="Breath">Breath</option>
+      <option value="RedBow">Red Bow</option>
+      <option value="BlueBow">Blue Bow</option>
+      <option value="GreenBow">Green Bow</option>
+      <option value="ColorlessBow">Colorless Bow</option>
+      <option value="RedDagger">Red Dagger</option>
+      <option value="BlueDagger">Blue Dagger</option>
+      <option value="GreenDagger">Green Dagger</option>
+      <option value="ColorlessDagger">Colorless Dagger</option>
+      <option value="RedTome">Red Tome</option>
+      <option value="BlueTome">Blue Tome</option>
+      <option value="GreenTome">Green Tome</option>
+      <option value="ColorlessTome">Colorless Tome</option>
+      <option value="RedBeast">Red Beast</option>
+      <option value="BlueBeast">Blue Beast</option>
+      <option value="GreenBeast">Green Beast</option>
+      <option value="ColorlessBeast">Colorless Beast</option>
+      <option value="RedBreath">Red Breath</option>
+      <option value="BlueBreath">Blue Breath</option>
+      <option value="GreenBreath">Green Breath</option>
+      <option value="ColorlessBreath">Colorless Breath</option>
     </select>
   <!-- <input name="image_url" placeholder="Image URL"> -->
     <button type="submit">Add Unit</button>
@@ -96,12 +119,27 @@
       <option value="Sword">Sword</option>
       <option value="Lance">Lance</option>
       <option value="Axe">Axe</option>
-      <option value="Bow">Bow</option>
-      <option value="Dagger">Dagger</option>
-      <option value="Tome">Tome</option>
       <option value="Staff">Staff</option>
-      <option value="Beast">Beast</option>
-      <option value="Breath">Breath</option>
+      <option value="RedBow">Red Bow</option>
+      <option value="BlueBow">Blue Bow</option>
+      <option value="GreenBow">Green Bow</option>
+      <option value="ColorlessBow">Colorless Bow</option>
+      <option value="RedDagger">Red Dagger</option>
+      <option value="BlueDagger">Blue Dagger</option>
+      <option value="GreenDagger">Green Dagger</option>
+      <option value="ColorlessDagger">Colorless Dagger</option>
+      <option value="RedTome">Red Tome</option>
+      <option value="BlueTome">Blue Tome</option>
+      <option value="GreenTome">Green Tome</option>
+      <option value="ColorlessTome">Colorless Tome</option>
+      <option value="RedBeast">Red Beast</option>
+      <option value="BlueBeast">Blue Beast</option>
+      <option value="GreenBeast">Green Beast</option>
+      <option value="ColorlessBeast">Colorless Beast</option>
+      <option value="RedBreath">Red Breath</option>
+      <option value="BlueBreath">Blue Breath</option>
+      <option value="GreenBreath">Green Breath</option>
+      <option value="ColorlessBreath">Colorless Breath</option>
     </select>
     <label for="effective_against">Effective Against:</label>
     <select name="effective_against" id="effective_against" multiple>
@@ -114,12 +152,27 @@
       <option value="Sword">Sword</option>
       <option value="Lance">Lance</option>
       <option value="Axe">Axe</option>
-      <option value="Bow">Bow</option>
-      <option value="Dagger">Dagger</option>
-      <option value="Tome">Tome</option>
       <option value="Staff">Staff</option>
-      <option value="Beast">Beast</option>
-      <option value="Breath">Breath</option>
+      <option value="RedBow">Red Bow</option>
+      <option value="BlueBow">Blue Bow</option>
+      <option value="GreenBow">Green Bow</option>
+      <option value="ColorlessBow">Colorless Bow</option>
+      <option value="RedDagger">Red Dagger</option>
+      <option value="BlueDagger">Blue Dagger</option>
+      <option value="GreenDagger">Green Dagger</option>
+      <option value="ColorlessDagger">Colorless Dagger</option>
+      <option value="RedTome">Red Tome</option>
+      <option value="BlueTome">Blue Tome</option>
+      <option value="GreenTome">Green Tome</option>
+      <option value="ColorlessTome">Colorless Tome</option>
+      <option value="RedBeast">Red Beast</option>
+      <option value="BlueBeast">Blue Beast</option>
+      <option value="GreenBeast">Green Beast</option>
+      <option value="ColorlessBeast">Colorless Beast</option>
+      <option value="RedBreath">Red Breath</option>
+      <option value="BlueBreath">Blue Breath</option>
+      <option value="GreenBreath">Green Breath</option>
+      <option value="ColorlessBreath">Colorless Breath</option>
     </select>
   <!-- <input name="image_url" placeholder="Image URL"> -->
     <button type="submit">Add Weapon</button>

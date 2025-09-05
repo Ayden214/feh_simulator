@@ -103,5 +103,83 @@ class FEHDatabase:
         )
         self.conn.commit()
 
+    def get_all_weapons(self):
+        cur = self.conn.execute('SELECT * FROM weapons ORDER BY name ASC')
+        return [dict(row) for row in cur.fetchall()]
+
+    def get_weapon_by_name(self, name):
+        cur = self.conn.execute('SELECT * FROM weapons WHERE name = ?', (name,))
+        return dict(cur.fetchone()) if cur.fetchone() else None
+
+    def update_weapon(self, old_name, weapon):
+        self.conn.execute(
+            """
+            UPDATE weapons SET
+                name = ?,
+                might = ?,
+                color = ?,
+                range = ?,
+                weapon_type = ?,
+                effective_against = ?
+            WHERE name = ?
+            """,
+            (
+                weapon["name"],
+                weapon["might"],
+                weapon.get("color"),
+                weapon.get("range"),
+                weapon.get("weapon_type"),
+                weapon.get("effective_against"),
+                old_name
+            )
+        )
+        self.conn.commit()
+
+    def get_weapon_types(self):
+        # List of all weapon types for dropdown
+        return [
+            "Sword", "Lance", "Axe", "Staff", "RedBow", "BlueBow", "GreenBow", "ColorlessBow",
+            "RedDagger", "BlueDagger", "GreenDagger", "ColorlessDagger",
+            "RedTome", "BlueTome", "GreenTome", "ColorlessTome",
+            "RedBeast", "BlueBeast", "GreenBeast", "ColorlessBeast",
+            "RedBreath", "BlueBreath", "GreenBreath", "ColorlessBreath"
+        ]
+
     def close(self):
         self.conn.close()
+
+def get_all_weapons():
+    db = FEHDatabase()
+    weapons = db.get_all_weapons()
+    db.close()
+    return weapons
+
+def get_weapon_by_name(name):
+    db = FEHDatabase()
+    weapon = db.get_weapon_by_name(name)
+    db.close()
+    return weapon
+
+def update_weapon(old_name, new_name, might, color, range_, weapon_type, effective_against):
+    db = FEHDatabase()
+    weapon = {
+        "name": new_name,
+        "might": might,
+        "color": color,
+        "range": range_,
+        "weapon_type": weapon_type,
+        "effective_against": effective_against
+    }
+    db.update_weapon(old_name, weapon)
+    db.close()
+
+def get_weapon_types():
+    db = FEHDatabase()
+    types = db.get_weapon_types()
+    db.close()
+    return types
+
+def delete_weapon(name):
+    db = FEHDatabase()
+    db.delete_weapon(name)
+    db.close()
