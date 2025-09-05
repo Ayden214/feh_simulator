@@ -1,194 +1,125 @@
 <!-- admin.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>FEH Admin Panel</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-</head>
-<body>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const typeSelect = document.getElementById('delete_type');
-      const nameSelect = document.getElementById('delete_name');
-      const unitNames = [{% for unit in units %}'{{ unit.name }}',{% endfor %}];
-      const weaponNames = [{% for weapon in weapons %}'{{ weapon.name }}',{% endfor %}];
-      const skillNames = [{% for skill in skills %}'{{ skill.name }}',{% endfor %}];
+{% extends "base.html" %}
+{% set weapon_types = [
+  'Sword', 'Lance', 'Axe', 'Staff',
+  'RedBow', 'BlueBow', 'GreenBow', 'ColorlessBow',
+  'RedDagger', 'BlueDagger', 'GreenDagger', 'ColorlessDagger',
+  'RedTome', 'BlueTome', 'GreenTome', 'ColorlessTome',
+  'RedBeast', 'BlueBeast', 'GreenBeast', 'ColorlessBeast',
+  'RedBreath', 'BlueBreath', 'GreenBreath', 'ColorlessBreath'
+] %}
+{% block content %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const typeSelect = document.getElementById('delete_type');
+    const nameSelect = document.getElementById('delete_name');
+    const unitNames = [{% for unit in units %}'{{ unit.name }}',{% endfor %}];
+    const weaponNames = [{% for weapon in weapons %}'{{ weapon.name }}',{% endfor %}];
+    const skillNames = [{% for skill in skills %}'{{ skill.name }}',{% endfor %}];
 
-      function updateNameOptions() {
-        let selectedType = typeSelect.value;
-        let names = [];
-        if (selectedType === 'unit') {
-          names = unitNames;
-        } else if (selectedType === 'weapon') {
-          names = weaponNames;
-        } else if (selectedType === 'skill') {
-          names = skillNames;
-        }
-        nameSelect.innerHTML = '';
-        names.forEach(function(name) {
-          let opt = document.createElement('option');
-          opt.value = name;
-          opt.textContent = name;
-          nameSelect.appendChild(opt);
-        });
+    function updateNameOptions() {
+      let selectedType = typeSelect.value;
+      let names = [];
+      if (selectedType === 'unit') {
+        names = unitNames;
+      } else if (selectedType === 'weapon') {
+        names = weaponNames;
+      } else if (selectedType === 'skill') {
+        names = skillNames;
       }
-      typeSelect.addEventListener('change', updateNameOptions);
-      updateNameOptions(); // Initial population
-    });
-  </script>
-  <h1>Admin: Add/Delete Units, Weapons, Skills</h1>
-  <div style="display: flex; gap: 32px; align-items: center; margin-bottom: 18px;">
-    <div>
-      <h2 style="margin-bottom: 8px;">Unit Management</h2>
-      <a href="/admin/units">View & Edit All Units</a>
-    </div>
-    <div>
-      <h2 style="margin-bottom: 8px;">Weapon Management</h2>
-      <a href="/admin/weapons">View & Edit All Weapons</a>
-    </div>
+      nameSelect.innerHTML = '';
+      names.forEach(function(name) {
+        let opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        nameSelect.appendChild(opt);
+      });
+    }
+    typeSelect.addEventListener('change', updateNameOptions);
+    updateNameOptions(); // Initial population
+  });
+</script>
+<h1>Admin: Add/Delete Units, Weapons, Skills</h1>
+<div style="display: flex; gap: 32px; align-items: center; margin-bottom: 18px;">
+  <div>
+    <h2 style="margin-bottom: 8px;">Unit Management</h2>
+    <a href="/admin/units">View & Edit All Units</a>
   </div>
-  <h2>Add Unit</h2>
-  <form method="POST" action="/admin?type=unit">
-    <input name="name" placeholder="Name" required>
-    <input name="hp" type="number" placeholder="HP" required>
-    <input name="atk" type="number" placeholder="Atk" required>
-    <input name="spd" type="number" placeholder="Spd" required>
-    <input name="defense" type="number" placeholder="Def" required>
-    <input name="res" type="number" placeholder="Res" required>
-    <label for="superboons">Superboons (comma separated):</label>
-    <input name="superboons" placeholder="e.g. atk,spd">
-    <label for="superbanes">Superbanes (comma separated):</label>
-    <input name="superbanes" placeholder="e.g. hp,res">
-    <label for="exclusive_skills">Exclusive Skills (comma separated):</label>
-    <input name="exclusive_skills" placeholder="e.g. Ragnell, Radiant Aether">
-    <label for="image_url">Image URL:</label>
-    <input name="image_url" placeholder="Image URL">
-    <label for="unit_type">Movement Type:</label>
-    <select name="unit_type" id="unit_type">
-      <option value="Infantry">Infantry</option>
-      <option value="Armor">Armor</option>
-      <option value="Cavalry">Cavalry</option>
-      <option value="Flier">Flier</option>
-    </select>
-    <label for="weapon_type">Weapon Type:</label>
-    <select name="weapon_type" id="weapon_type">
-      <option value="Sword">Sword</option>
-      <option value="Lance">Lance</option>
-      <option value="Axe">Axe</option>
-      <option value="Staff">Staff</option>
-      <option value="RedBow">Red Bow</option>
-      <option value="BlueBow">Blue Bow</option>
-      <option value="GreenBow">Green Bow</option>
-      <option value="ColorlessBow">Colorless Bow</option>
-      <option value="RedDagger">Red Dagger</option>
-      <option value="BlueDagger">Blue Dagger</option>
-      <option value="GreenDagger">Green Dagger</option>
-      <option value="ColorlessDagger">Colorless Dagger</option>
-      <option value="RedTome">Red Tome</option>
-      <option value="BlueTome">Blue Tome</option>
-      <option value="GreenTome">Green Tome</option>
-      <option value="ColorlessTome">Colorless Tome</option>
-      <option value="RedBeast">Red Beast</option>
-      <option value="BlueBeast">Blue Beast</option>
-      <option value="GreenBeast">Green Beast</option>
-      <option value="ColorlessBeast">Colorless Beast</option>
-      <option value="RedBreath">Red Breath</option>
-      <option value="BlueBreath">Blue Breath</option>
-      <option value="GreenBreath">Green Breath</option>
-      <option value="ColorlessBreath">Colorless Breath</option>
-    </select>
-  <!-- <input name="image_url" placeholder="Image URL"> -->
-    <button type="submit">Add Unit</button>
-  </form>
-
-  <h2>Add Weapon</h2>
-  <form method="POST" action="/admin?type=weapon">
-    <input name="name" placeholder="Name" required>
-    <input name="might" type="number" placeholder="Might" required>
-    <label for="color">Color:</label>
-    <select name="color" id="color">
-      <option value="blue">Blue</option>
-      <option value="red">Red</option>
-      <option value="green">Green</option>
-      <option value="colorless">Colorless</option>
-    </select>
-    <input name="range" type="number" placeholder="Range" required>
-    <label for="weapon_type">Weapon Type:</label>
-    <select name="weapon_type" id="weapon_type">
-      <option value="Sword">Sword</option>
-      <option value="Lance">Lance</option>
-      <option value="Axe">Axe</option>
-      <option value="Staff">Staff</option>
-      <option value="RedBow">Red Bow</option>
-      <option value="BlueBow">Blue Bow</option>
-      <option value="GreenBow">Green Bow</option>
-      <option value="ColorlessBow">Colorless Bow</option>
-      <option value="RedDagger">Red Dagger</option>
-      <option value="BlueDagger">Blue Dagger</option>
-      <option value="GreenDagger">Green Dagger</option>
-      <option value="ColorlessDagger">Colorless Dagger</option>
-      <option value="RedTome">Red Tome</option>
-      <option value="BlueTome">Blue Tome</option>
-      <option value="GreenTome">Green Tome</option>
-      <option value="ColorlessTome">Colorless Tome</option>
-      <option value="RedBeast">Red Beast</option>
-      <option value="BlueBeast">Blue Beast</option>
-      <option value="GreenBeast">Green Beast</option>
-      <option value="ColorlessBeast">Colorless Beast</option>
-      <option value="RedBreath">Red Breath</option>
-      <option value="BlueBreath">Blue Breath</option>
-      <option value="GreenBreath">Green Breath</option>
-      <option value="ColorlessBreath">Colorless Breath</option>
-    </select>
-    <label for="effective_against">Effective Against:</label>
-    <select name="effective_against" id="effective_against" multiple>
-      <!-- Movement types -->
-      <option value="Infantry">Infantry</option>
-      <option value="Armor">Armor</option>
-      <option value="Cavalry">Cavalry</option>
-      <option value="Flier">Flier</option>
-      <!-- Weapon types -->
-      <option value="Sword">Sword</option>
-      <option value="Lance">Lance</option>
-      <option value="Axe">Axe</option>
-      <option value="Staff">Staff</option>
-      <option value="RedBow">Red Bow</option>
-      <option value="BlueBow">Blue Bow</option>
-      <option value="GreenBow">Green Bow</option>
-      <option value="ColorlessBow">Colorless Bow</option>
-      <option value="RedDagger">Red Dagger</option>
-      <option value="BlueDagger">Blue Dagger</option>
-      <option value="GreenDagger">Green Dagger</option>
-      <option value="ColorlessDagger">Colorless Dagger</option>
-      <option value="RedTome">Red Tome</option>
-      <option value="BlueTome">Blue Tome</option>
-      <option value="GreenTome">Green Tome</option>
-      <option value="ColorlessTome">Colorless Tome</option>
-      <option value="RedBeast">Red Beast</option>
-      <option value="BlueBeast">Blue Beast</option>
-      <option value="GreenBeast">Green Beast</option>
-      <option value="ColorlessBeast">Colorless Beast</option>
-      <option value="RedBreath">Red Breath</option>
-      <option value="BlueBreath">Blue Breath</option>
-      <option value="GreenBreath">Green Breath</option>
-      <option value="ColorlessBreath">Colorless Breath</option>
-    </select>
-  <!-- <input name="image_url" placeholder="Image URL"> -->
-    <button type="submit">Add Weapon</button>
-  </form>
-
-  <h2>Add Skill</h2>
-  <form method="POST" action="/admin?type=skill">
-    <input name="name" placeholder="Name" required>
-    <input name="description" placeholder="Description">
-    <input name="skill_type" placeholder="Type (special, passive, etc)">
-    <input name="effect_json" placeholder="Effect JSON">
-    <button type="submit">Add Skill</button>
-  </form>
-
-  {% if message %}
-  <p><strong>{{ message }}</strong></p>
-  {% endif %}
-</body>
-</html>
+  <div>
+    <h2 style="margin-bottom: 8px;">Weapon Management</h2>
+    <a href="/admin/weapons">View & Edit All Weapons</a>
+  </div>
+</div>
+<h2>Add Unit</h2>
+<form method="POST" action="/admin?type=unit">
+  <input name="name" placeholder="Name" required>
+  <input name="hp" type="number" placeholder="HP" required>
+  <input name="atk" type="number" placeholder="Atk" required>
+  <input name="spd" type="number" placeholder="Spd" required>
+  <input name="defense" type="number" placeholder="Def" required>
+  <input name="res" type="number" placeholder="Res" required>
+  <label for="superboons">Superboons (comma separated):</label>
+  <input name="superboons" placeholder="e.g. atk,spd">
+  <label for="superbanes">Superbanes (comma separated):</label>
+  <input name="superbanes" placeholder="e.g. hp,res">
+  <label for="exclusive_skills">Exclusive Skills (comma separated):</label>
+  <input name="exclusive_skills" placeholder="e.g. Ragnell, Radiant Aether">
+  <label for="image_url">Image URL:</label>
+  <input name="image_url" placeholder="Image URL">
+  <label for="unit_type">Movement Type:</label>
+  <select name="unit_type" id="unit_type">
+    <option value="Infantry">Infantry</option>
+    <option value="Armor">Armor</option>
+    <option value="Cavalry">Cavalry</option>
+    <option value="Flier">Flier</option>
+  </select>
+  <label for="weapon_type">Weapon Type:</label>
+  <select name="weapon_type" id="weapon_type">
+    {% for wt in weapon_types %}
+    <option value="{{ wt }}">{{ wt.replace('Bow',' Bow').replace('Dagger',' Dagger').replace('Tome',' Tome').replace('Beast',' Beast').replace('Breath',' Breath') }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit">Add Unit</button>
+</form>
+<h2>Add Weapon</h2>
+<form method="POST" action="/admin?type=weapon">
+  <input name="name" placeholder="Name" required>
+  <input name="might" type="number" placeholder="Might" required>
+  <label for="color">Color:</label>
+  <select name="color" id="color">
+    <option value="blue">Blue</option>
+    <option value="red">Red</option>
+    <option value="green">Green</option>
+    <option value="colorless">Colorless</option>
+  </select>
+  <input name="range" type="number" placeholder="Range" required>
+  <label for="weapon_type">Weapon Type:</label>
+  <select name="weapon_type" id="weapon_type">
+    {% for wt in weapon_types %}
+    <option value="{{ wt }}">{{ wt.replace('Bow',' Bow').replace('Dagger',' Dagger').replace('Tome',' Tome').replace('Beast',' Beast').replace('Breath',' Breath') }}</option>
+    {% endfor %}
+  </select>
+  <label for="effective_against">Effective Against:</label>
+  <select name="effective_against" id="effective_against" multiple>
+    <option value="Infantry">Infantry</option>
+    <option value="Armor">Armor</option>
+    <option value="Cavalry">Cavalry</option>
+    <option value="Flier">Flier</option>
+    {% for wt in weapon_types %}
+    <option value="{{ wt }}">{{ wt.replace('Bow',' Bow').replace('Dagger',' Dagger').replace('Tome',' Tome').replace('Beast',' Beast').replace('Breath',' Breath') }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit">Add Weapon</button>
+</form>
+<h2>Add Skill</h2>
+<form method="POST" action="/admin?type=skill">
+  <input name="name" placeholder="Name" required>
+  <input name="description" placeholder="Description">
+  <input name="skill_type" placeholder="Type (special, passive, etc)">
+  <input name="effect_json" placeholder="Effect JSON">
+  <button type="submit">Add Skill</button>
+</form>
+{% if message %}
+<p><strong>{{ message }}</strong></p>
+{% endif %}
+{% endblock %}

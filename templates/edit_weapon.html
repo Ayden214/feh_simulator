@@ -1,40 +1,33 @@
 <!-- edit_weapon.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Edit Weapon</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-</head>
-<body>
-  <h1>Edit Weapon: {{ weapon.name }}</h1>
-  <form method="POST">
-    <label for="name">Name:</label>
-    <input name="name" value="{{ weapon.name }}" required>
-    <label for="might">Might:</label>
-    <input name="might" type="number" value="{{ weapon.might }}" required>
-    <label for="color">Color:</label>
-    <select name="color">
-      <option value="blue" {% if weapon.color == 'blue' %}selected{% endif %}>Blue</option>
-      <option value="red" {% if weapon.color == 'red' %}selected{% endif %}>Red</option>
-      <option value="green" {% if weapon.color == 'green' %}selected{% endif %}>Green</option>
-      <option value="colorless" {% if weapon.color == 'colorless' %}selected{% endif %}>Colorless</option>
-    </select>
-    <label for="range">Range:</label>
-    <input name="range" type="number" value="{{ weapon.range }}" required>
-    <label for="weapon_type">Weapon Type:</label>
-    <select name="weapon_type">
-      {% for wt in weapon_types %}
-      <option value="{{ wt }}" {% if weapon.weapon_type == wt %}selected{% endif %}>{{ wt }}</option>
-      {% endfor %}
-    </select>
-    <label for="effective_against">Effective Against (comma separated):</label>
-    <input name="effective_against" value="{{ weapon.effective_against }}">
-    <button type="submit">Save Changes</button>
-  </form>
-  <form method="POST" action="/admin/delete/weapon/{{ weapon.name }}" style="margin-top:16px;">
-    <button type="submit" style="background-color:#c00;color:#fff;">Delete Weapon</button>
-  </form>
-  <a href="/admin/weapons">Back to Weapon List</a>
-</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+<h1>Edit Weapon: {{ weapon.name }}</h1>
+<form method="POST">
+  <label for="name">Name:</label>
+  <input name="name" value="{{ weapon.name }}" required>
+  <label for="might">Might:</label>
+  <input name="might" type="number" value="{{ weapon.might }}" required>
+  <label for="color">Color:</label>
+  <select name="color">
+    <option value="blue" {% if weapon.color == 'blue' %}selected{% endif %}>Blue</option>
+    <option value="red" {% if weapon.color == 'red' %}selected{% endif %}>Red</option>
+    <option value="green" {% if weapon.color == 'green' %}selected{% endif %}>Green</option>
+    <option value="colorless" {% if weapon.color == 'colorless' %}selected{% endif %}>Colorless</option>
+  </select>
+  <label for="range">Range:</label>
+  <input name="range" type="number" value="{{ weapon.range }}" required>
+  <label for="weapon_type">Weapon Type:</label>
+  <select name="weapon_type">
+    {% for wt in weapon_types %}
+    <option value="{{ wt }}" {% if weapon.weapon_type == wt %}selected{% endif %}>{{ wt.replace('Bow',' Bow').replace('Dagger',' Dagger').replace('Tome',' Tome').replace('Beast',' Beast').replace('Breath',' Breath') }}</option>
+    {% endfor %}
+  </select>
+  <label for="effective_against">Effective Against (comma separated):</label>
+  <input name="effective_against" value="{{ weapon.effective_against }}">
+  <button type="submit">Save Changes</button>
+</form>
+<form method="POST" action="/admin/delete/weapon/{{ weapon.name }}" style="margin-top:16px;">
+  <button type="submit" style="background-color:#c00;color:#fff;">Delete Weapon</button>
+</form>
+<a href="/admin/weapons">Back to Weapon List</a>
+{% endblock %}

@@ -1,45 +1,37 @@
-<!-- weapon_list.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Weapon List</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-</head>
-<body>
-  <h1>All Weapons</h1>
-  <table border="1" style="width:100%;margin-bottom:24px;">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Might</th>
-        <th>Color</th>
-        <th>Range</th>
-        <th>Weapon Type</th>
-        <th>Effective Against</th>
-        <th>Edit</th>
-        <th>Delete</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for weapon in weapons %}
-      <tr>
-        <td>{{ weapon.name }}</td>
-        <td>{{ weapon.might }}</td>
-        <td>{{ weapon.color }}</td>
-        <td>{{ weapon.range }}</td>
-        <td>{{ weapon.weapon_type }}</td>
-        <td>{{ weapon.effective_against }}</td>
-        <td><a href="/admin/edit/weapon/{{ weapon.name }}">Edit</a></td>
-        <td>
-          <form method="POST" action="/admin/delete/weapon/{{ weapon.name }}" style="display:inline;">
-            <button type="submit" onclick="return confirm('Delete weapon {{ weapon.name }}?');">Delete</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <a href="/admin">Back to Admin</a>
-</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+<h1>All Weapons</h1>
+<table border="1" style="width:100%;margin-bottom:24px;">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Might</th>
+      <th>Color</th>
+      <th>Range</th>
+      <th>Weapon Type</th>
+      <th>Effective Against</th>
+      <th>Edit</th>
+      <th>Delete</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for weapon in weapons %}
+    <tr>
+      <td>{{ weapon.name }}</td>
+      <td>{{ weapon.might }}</td>
+      <td>{{ weapon.color }}</td>
+      <td>{{ weapon.range }}</td>
+      <td>{{ weapon.weapon_type }}</td>
+      <td>{{ weapon.effective_against }}</td>
+      <td><a href="/admin/edit/weapon/{{ weapon.name }}">Edit</a></td>
+      <td>
+        <form method="POST" action="/admin/delete/weapon/{{ weapon.name }}" style="display:inline;">
+          <button type="submit" style="background-color:#c00;color:#fff;">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<a href="/admin">Back to Admin</a>
+{% endblock %}
