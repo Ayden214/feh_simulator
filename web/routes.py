@@ -130,8 +130,11 @@ def index():
                 weapon_type=defender_weapon.get('weapon_type')
             )
         if attacker and defender:
-            dmg = calculate_damage(attacker, defender)
-            result = f"{attacker.name} deals {dmg} damage to {defender.name}!"
+            # Show only the part before the comma for names
+            attacker_short = attacker.name.split(',')[0].strip()
+            defender_short = defender.name.split(',')[0].strip()
+            dmg, log = calculate_damage(attacker, defender)
+            result = f"{attacker_short} deals {dmg} damage to {defender_short}!"
 
     return render_template("index.html", units=units_for_template, weapons=weapons, skills=skills, result=result)
 
