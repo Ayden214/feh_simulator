@@ -65,12 +65,11 @@ h1 {
   margin-right: 0;
   justify-content: flex-start;
 }
-
-/* Flip defender image vertically */
+/*
 .feh-hero-img-right img {
   transform: scaleX(-1);
 }
-
+*/
 .feh-group {
   margin-bottom: 16px;
 }
@@ -91,11 +90,20 @@ select, button {
   border: 2px solid #ff003c;
 }
 
+input[type="number"], input[type="text"] {
+  background: #222326;
+  color: #ffe600;
+  border: 2px solid #ff003c;
+  border-radius: 6px;
+  padding: 5px;
+}
+
 textarea#combat-text {
   margin-top: 24px;
   font-size: 1.1em;
   border-radius: 8px;
   border: 2px solid #ff003c;
-  background: #444;
+  background: #33363a;
+  color: #fff;
   padding: 12px;
 }

@@ -171,13 +171,14 @@ def admin():
             if any(w['name'].lower() == name.lower() for w in weapons):
                 message = f"Weapon '{name}' already exists."
             else:
+                effective_against_list = request.form.getlist("effective_against")
                 weapon = {
                     "name": name,
                     "might": int(request.form.get("might")),
                     "color": request.form.get("color"),
                     "range": int(request.form.get("range")),
                     "weapon_type": request.form.get("weapon_type"),
-                    "effective_against": request.form.getlist("effective_against")
+                    "effective_against": ",".join(effective_against_list)
                 }
                 db.add_weapon(weapon)
                 message = f"Weapon '{weapon['name']}' added."
@@ -281,4 +282,4 @@ def edit_weapon(name):
 def delete_weapon(name):
     from simulator.data_loader import delete_weapon
     delete_weapon(name)
-    return redirect(url_for('web.weapon_list'))
+    return redirect(url_for('main.weapon_list'))

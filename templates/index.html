@@ -26,7 +26,7 @@ and a submit button to calculate battle results.
   <form method="POST" style="max-width:1200px;margin:auto;">
     <div class="feh-flex">
       <!-- Attacker Image (left of column, large portrait) -->
-      <div class="feh-hero-img feh-hero-img-large feh-hero-img-left" id="attacker-img"></div>
+      <div class="feh-hero-img feh-hero-img-large feh-hero-img-left" id="attacker-img" style="min-width:640px;min-height:750px;"></div>
 
       <!-- Attacker Column: header, info panel, and all options -->
       <div class="feh-column">
@@ -180,11 +180,11 @@ and a submit button to calculate battle results.
         </div>
       </div>
       <!-- Defender Image (right of column, large portrait) -->
-      <div class="feh-hero-img feh-hero-img-large feh-hero-img-right" id="defender-img"></div>
+      <div class="feh-hero-img feh-hero-img-large feh-hero-img-right" id="defender-img" style="min-width:640px;min-height:750px;"></div>
     </div>
     <!-- Combat log output area -->
     <br>
-    <textarea id="combat-text" readonly style="width:100%;height:120px;font-size:18px;margin-top:20px;resize:none;background:#f9f9f9;border:2px solid #888;">{{ result if result else 'Select options to see combat results.' }}</textarea>
+    <textarea id="combat-text" readonly style="width:100%;height:120px;font-size:18px;margin-top:20px;resize:none;">{{ result if result else 'Select options to see combat results.' }}</textarea>
   </form>
 
   <!--
@@ -204,11 +204,11 @@ and a submit button to calculate battle results.
         imgDiv.innerHTML = '';
         return;
       }
-  // Only show image in imgDiv
-  imgDiv.innerHTML = unit.image_url ? `<img src='${unit.image_url}' alt='${unit.name}' width='640' height='750' style='border-radius:12px;'>` : '';
+      const placeholderImg = '/static/img/placeholder.png';
+      imgDiv.innerHTML = unit.image_url ? `<img src='${unit.image_url}' alt='${unit.name}' width='640' height='750' style='border-radius:12px;' onerror="this.onerror=null;this.src='${placeholderImg}';">` : `<img src='${placeholderImg}' alt='No unit selected' width='640' height='750' style='border-radius:12px;opacity:0.5;'>`;
       // Show stats/info in infoDiv
       infoDiv.innerHTML = `
-        <div style="border:1px solid #ccc; padding:8px; margin:8px 0; background:#f9f9f9;">
+        <div style="border:1px solid #ccc; padding:8px; margin:8px 0;">
           <strong>${unit.name}</strong><br>
           <span>HP: ${unit.hp}, Atk: ${unit.atk}, Spd: ${unit.spd}, Def: ${unit.defense}, Res: ${unit.res}</span><br>
           <span>Movement: ${unit.unit_type}, Weapon: ${unit.weapon_type}</span><br>
@@ -236,3 +236,8 @@ and a submit button to calculate battle results.
       });
     });
   </script>
+  <footer style="text-align:center; margin-top:32px; color:#ffe600;">
+  <small>All art belongs to Nintendo. This site is a fan project and not affiliated with Nintendo or Intelligent Systems.</small>
+</footer>
+</body>
+</html>
