@@ -1,85 +1,23 @@
-def unit_to_dict(u):
-    return {
-        'name': u.name,
-        'hp': u.hp,
-        'atk': u.atk,
-        'spd': u.spd,
-        'defense': u.defense,
-        'res': u.res,
-        'superboons': u.superboons,
-        'superbanes': u.superbanes,
-        'exclusive_skills': u.exclusive_skills,
-        'image_url': u.image_url,
-        'unit_type': u.unit_type,
-        'weapon_type': u.weapon_type
-    }
 """
 routes.py
 ---------
-Defines the URL routes (pages) for the FEH simulator web app.
-Handles rendering templates, receiving form data, and calling
-battle calculation functions from the simulator module.
+Defines all URL routes for the FEH simulator web app.
+Handles rendering templates, form data, and simulation logic.
 """
 
 from flask import Blueprint, render_template, request, redirect, url_for
 from simulator.calculations import calculate_damage
 from simulator.units import Unit
-from simulator.data_loader import FEHDatabase
+from simulator.data_loader import FEHDatabase, get_all_weapons, get_weapon_by_name, update_weapon, get_weapon_types, delete_weapon
 
-# Create a Blueprint to group related routes
-# This keeps our app modular and easier to scale
 main = Blueprint("main", __name__)
 
-
-def get_units_from_db():
-    db = FEHDatabase()
-    units = db.get_units()
-    weapons = db.get_weapons()
-    db.close()
-    # Map weapons to units (simple: first weapon)
-    unit_objs = []
-    for u in units:
-        uw = [w for w in weapons if w['id'] in [u.get('weapon_id')] if u.get('weapon_id')]
-        weapon = None
-        if uw:
-            weapon = uw[0]
-        # Create Unit object
-        unit_obj = Unit(
-            name=u['name'],
-            hp=u['hp'],
-            atk=u['atk'],
-            spd=u['spd'],
-            defense=u['defense'],
-            res=u['res'],
-            superboons=u.get('superboons', []),
-            superbanes=u.get('superbanes', []),
-            exclusive_skills=u.get('exclusive_skills', []),
-            image_url=u.get('image_url', ''),
-            unit_type=u.get('unit_type', ''),
-            weapon_type=u.get('weapon_type', '')
-        )
-        # Attach weapon info if available
-        if weapon:
-            unit_obj.equipped_weapon = weapon
-        unit_objs.append(unit_obj)
-    return unit_objs
-
+# --- Public Routes ---
 @main.route("/", methods=["GET", "POST"])
 def index():
-    """
-    Homepage route: Displays a form to select an attacker and defender,
-    runs the battle simulation, and returns results.
-
-    Methods:
-        GET: Shows the empty form.
-        POST: Processes the form, calculates damage, and displays results.
-
-    Returns:
-        HTML page rendered from templates/index.html with optional result data.
-    """
+    """Homepage: Select attacker/defender, run simulation, show results."""
     result = None
     units = get_units_from_db()
-    # Convert Unit objects to dicts for template (for tojson)
     units_for_template = [unit_to_dict(u) for u in units]
     db = FEHDatabase()
     weapons = db.get_weapons()
@@ -95,7 +33,6 @@ def index():
         defender = next((u for u in units if u.name == defender_name), None)
         attacker_weapon = next((w for w in weapons if w['name'] == attacker_weapon_name), None)
         defender_weapon = next((w for w in weapons if w['name'] == defender_weapon_name), None)
-        # Skill slots
         skill_slots = ['assist', 'special', 'a', 'b', 'c', 'seal', 'x']
         for slot in skill_slots:
             attacker_skill_name = request.form.get(f'attacker_{slot}')
@@ -130,7 +67,6 @@ def index():
                 weapon_type=defender_weapon.get('weapon_type')
             )
         if attacker and defender:
-            # Show only the part before the comma for names
             attacker_short = attacker.name.split(',')[0].strip()
             defender_short = defender.name.split(',')[0].strip()
             dmg, log = calculate_damage(attacker, defender)
@@ -138,8 +74,29 @@ def index():
 
     return render_template("index.html", units=units_for_template, weapons=weapons, skills=skills, result=result)
 
+@main.route("/about")
+def about():
+    """About page."""
+    return render_template("about.html")
+
+@main.route("/units")
+def units_list():
+    """Public unit list."""
+    db = FEHDatabase()
+    units = db.get_units()
+    db.close()
+    return render_template("unit_list.html", units=units, search=None)
+
+@main.route("/weapons")
+def weapons_list():
+    """Public weapon list."""
+    weapons = get_all_weapons()
+    return render_template("weapon_list.html", weapons=weapons)
+
+# --- Admin Routes ---
 @main.route("/admin", methods=["GET", "POST"])
-def admin():
+def admin_panel():
+    """Admin dashboard for managing units, weapons, skills."""
     db = FEHDatabase()
     units = db.get_units()
     weapons = db.get_weapons()
@@ -149,7 +106,6 @@ def admin():
         form_type = request.args.get("type")
         if form_type == "unit":
             name = request.form.get("name")
-            # Check for duplicate unit name
             if any(u['name'].lower() == name.lower() for u in units):
                 message = f"Unit '{name}' already exists."
             else:
@@ -214,7 +170,8 @@ def admin():
     return render_template("admin.html", units=units, weapons=weapons, skills=skills, message=message)
 
 @main.route("/admin/units", methods=["GET"])
-def admin_unit_list():
+def admin_units():
+    """Admin unit list."""
     db = FEHDatabase()
     units = db.get_units()
     db.close()
@@ -225,13 +182,15 @@ def admin_unit_list():
 
 @main.route("/admin/delete/unit/<unit_name>", methods=["POST"])
 def admin_delete_unit(unit_name):
+    """Delete unit (admin)."""
     db = FEHDatabase()
     db.delete_unit(unit_name)
     db.close()
-    return redirect(url_for('main.admin_unit_list'))
+    return redirect(url_for('main.admin_units'))
 
 @main.route("/admin/edit/unit/<unit_name>", methods=["GET", "POST"])
 def admin_edit_unit(unit_name):
+    """Edit unit (admin)."""
     db = FEHDatabase()
     units = db.get_units()
     unit = next((u for u in units if u['name'] == unit_name), None)
@@ -240,7 +199,6 @@ def admin_edit_unit(unit_name):
         db.close()
         return render_template("edit_unit.html", unit=None, message="Unit not found.")
     if request.method == "POST":
-        # Update unit fields from form
         unit["name"] = request.form.get("name")
         unit["hp"] = int(request.form.get("hp"))
         unit["atk"] = int(request.form.get("atk"))
@@ -260,14 +218,14 @@ def admin_edit_unit(unit_name):
     return render_template("edit_unit.html", unit=unit, message=message)
 
 @main.route('/admin/weapons')
-def weapon_list():
-    from simulator.data_loader import get_all_weapons
+def admin_weapons():
+    """Admin weapon list."""
     weapons = get_all_weapons()
     return render_template('weapon_list.html', weapons=weapons)
 
 @main.route('/admin/edit/weapon/<name>', methods=['GET', 'POST'])
-def edit_weapon(name):
-    from simulator.data_loader import get_weapon_by_name, update_weapon, get_weapon_types
+def admin_edit_weapon(name):
+    """Edit weapon (admin)."""
     weapon = get_weapon_by_name(name)
     weapon_types = get_weapon_types()
     if request.method == 'POST':
@@ -278,11 +236,56 @@ def edit_weapon(name):
         weapon_type = request.form['weapon_type']
         effective_against = request.form['effective_against']
         update_weapon(name, new_name, might, color, range_, weapon_type, effective_against)
-        return redirect(url_for('web.weapon_list'))
+        return redirect(url_for('main.admin_weapons'))
     return render_template('edit_weapon.html', weapon=weapon, weapon_types=weapon_types)
 
 @main.route('/admin/delete/weapon/<name>', methods=['POST'])
-def delete_weapon(name):
-    from simulator.data_loader import delete_weapon
+def admin_delete_weapon(name):
+    """Delete weapon (admin)."""
     delete_weapon(name)
-    return redirect(url_for('main.weapon_list'))
+    return redirect(url_for('main.admin_weapons'))
+
+# --- Helper Functions ---
+def unit_to_dict(u):
+    return {
+        'name': u.name,
+        'hp': u.hp,
+        'atk': u.atk,
+        'spd': u.spd,
+        'defense': u.defense,
+        'res': u.res,
+        'superboons': u.superboons,
+        'superbanes': u.superbanes,
+        'exclusive_skills': u.exclusive_skills,
+        'image_url': u.image_url,
+        'unit_type': u.unit_type,
+        'weapon_type': u.weapon_type
+    }
+
+def get_units_from_db():
+    db = FEHDatabase()
+    units = db.get_units()
+    weapons = db.get_weapons()
+    db.close()
+    unit_objs = []
+    for u in units:
+        uw = [w for w in weapons if w['id'] in [u.get('weapon_id')] if u.get('weapon_id')]
+        weapon = uw[0] if uw else None
+        unit_obj = Unit(
+            name=u['name'],
+            hp=u['hp'],
+            atk=u['atk'],
+            spd=u['spd'],
+            defense=u['defense'],
+            res=u['res'],
+            superboons=u.get('superboons', []),
+            superbanes=u.get('superbanes', []),
+            exclusive_skills=u.get('exclusive_skills', []),
+            image_url=u.get('image_url', ''),
+            unit_type=u.get('unit_type', ''),
+            weapon_type=u.get('weapon_type', '')
+        )
+        if weapon:
+            unit_obj.equipped_weapon = weapon
+        unit_objs.append(unit_obj)
+    return unit_objs
