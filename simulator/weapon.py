@@ -22,7 +22,7 @@ class Weapon:
         self.might = might
         self.color = color
         self.range = range
-        self.type = weapon_type  # for compatibility with previous code
+        self.weapon_type  = weapon_type  # for compatibility with previous code
         self.effects = effects if effects is not None else []
 
     def apply_effects(self, context):

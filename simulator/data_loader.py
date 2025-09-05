@@ -73,5 +73,35 @@ class FEHDatabase:
         self.conn.commit()
         return cur.lastrowid
 
+    def update_unit(self, old_name, unit):
+        self.conn.execute(
+            """
+            UPDATE units SET
+                name = ?,
+                hp = ?,
+                atk = ?,
+                spd = ?,
+                defense = ?,
+                res = ?,
+                unit_type = ?,
+                weapon_type = ?,
+                image_url = ?
+            WHERE name = ?
+            """,
+            (
+                unit["name"],
+                unit["hp"],
+                unit["atk"],
+                unit["spd"],
+                unit["defense"],
+                unit["res"],
+                unit.get("unit_type"),
+                unit.get("weapon_type"),
+                unit.get("image_url"),
+                old_name
+            )
+        )
+        self.conn.commit()
+
     def close(self):
         self.conn.close()

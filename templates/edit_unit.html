@@ -1,0 +1,51 @@
+<!-- edit_unit.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Unit</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <h1>Edit Unit: {{ unit.name }}</h1>
+  <form method="POST">
+    <label for="name">Name:</label>
+    <input name="name" id="name" value="{{ unit.name }}" required>
+    <label for="hp">HP:</label>
+    <input name="hp" id="hp" type="number" value="{{ unit.hp }}" required>
+    <label for="atk">Atk:</label>
+    <input name="atk" id="atk" type="number" value="{{ unit.atk }}" required>
+    <label for="spd">Spd:</label>
+    <input name="spd" id="spd" type="number" value="{{ unit.spd }}" required>
+    <label for="defense">Def:</label>
+    <input name="defense" id="defense" type="number" value="{{ unit.defense }}" required>
+    <label for="res">Res:</label>
+    <input name="res" id="res" type="number" value="{{ unit.res }}" required>
+    <label for="superboons">Superboons (comma separated):</label>
+    <input name="superboons" id="superboons" value="{{ unit.superboons|join(', ') }}">
+    <label for="superbanes">Superbanes (comma separated):</label>
+    <input name="superbanes" id="superbanes" value="{{ unit.superbanes|join(', ') }}">
+    <label for="exclusive_skills">Exclusive Skills (comma separated):</label>
+    <input name="exclusive_skills" id="exclusive_skills" value="{{ unit.exclusive_skills|join(', ') }}">
+    <label for="image_url">Image URL:</label>
+    <input name="image_url" id="image_url" value="{{ unit.image_url }}">
+    <label for="unit_type">Movement Type:</label>
+    <select name="unit_type" id="unit_type">
+      {% for type in ['Infantry','Armor','Cavalry','Flier'] %}
+      <option value="{{ type }}" {% if unit.unit_type == type %}selected{% endif %}>{{ type }}</option>
+      {% endfor %}
+    </select>
+    <label for="weapon_type">Weapon Type:</label>
+    <select name="weapon_type" id="weapon_type">
+      {% for type in ['Sword','Lance','Axe','Bow','Dagger','Tome','Staff','Beast','Breath'] %}
+      <option value="{{ type }}" {% if unit.weapon_type == type %}selected{% endif %}>{{ type }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Save Changes</button>
+    <a href="/admin/units">Cancel</a>
+  </form>
+  {% if message %}
+  <p><strong>{{ message }}</strong></p>
+  {% endif %}
+</body>
+</html>

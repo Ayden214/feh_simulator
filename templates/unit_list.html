@@ -1,0 +1,54 @@
+<!-- unit_list.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Unit List</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <h1>All Units</h1>
+  <form method="get" action="/admin/units" style="margin-bottom:18px;">
+    <label for="search">Search by name:</label>
+    <input type="text" id="search" name="search" value="{{ search|default('') }}" placeholder="Unit name...">
+    <button type="submit">Search</button>
+  </form>
+  <table border="1" style="width:100%;margin-bottom:24px;">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>HP</th>
+        <th>Atk</th>
+        <th>Spd</th>
+        <th>Def</th>
+        <th>Res</th>
+        <th>Weapon Type</th>
+        <th>Movement Type</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for unit in units %}
+      <tr>
+        <td>{{ unit.name }}</td>
+        <td>{{ unit.hp }}</td>
+        <td>{{ unit.atk }}</td>
+        <td>{{ unit.spd }}</td>
+        <td>{{ unit.defense }}</td>
+        <td>{{ unit.res }}</td>
+        <td>{{ unit.weapon_type }}</td>
+        <td>{{ unit.unit_type }}</td>
+        <td><a href="/admin/edit/unit/{{ unit.name }}">Edit</a></td>
+        <td>
+          <form method="POST" action="/admin/delete/unit/{{ unit.name }}" style="display:inline;">
+            <button type="submit" onclick="return confirm('Delete unit {{ unit.name }}?');">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <a href="/admin">Back to Admin</a>
+</body>
+</html>

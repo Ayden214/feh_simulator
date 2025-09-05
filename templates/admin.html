@@ -38,32 +38,8 @@
     });
   </script>
   <h1>Admin: Add/Delete Units, Weapons, Skills</h1>
-  <h2>Delete Entry</h2>
-  <form method="POST" action="/admin?type=delete">
-    <label for="delete_type">Type:</label>
-    <select name="delete_type" id="delete_type">
-      <option value="unit">Unit</option>
-      <option value="weapon">Weapon</option>
-      <option value="skill">Skill</option>
-    </select>
-    <label for="delete_name">Name:</label>
-    <select name="delete_name" id="delete_name">
-      {% if delete_type == 'unit' or not delete_type %}
-        {% for unit in units %}
-        <option value="{{ unit.name }}">{{ unit.name }}</option>
-        {% endfor %}
-      {% elif delete_type == 'weapon' %}
-        {% for weapon in weapons %}
-        <option value="{{ weapon.name }}">{{ weapon.name }}</option>
-        {% endfor %}
-      {% elif delete_type == 'skill' %}
-        {% for skill in skills %}
-        <option value="{{ skill.name }}">{{ skill.name }}</option>
-        {% endfor %}
-      {% endif %}
-    </select>
-    <button type="submit">Delete</button>
-  </form>
+  <h2>Unit Management</h2>
+  <a href="/admin/units">View & Edit All Units</a>
   <h2>Add Unit</h2>
   <form method="POST" action="/admin?type=unit">
     <input name="name" placeholder="Name" required>

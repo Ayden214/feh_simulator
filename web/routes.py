@@ -21,7 +21,7 @@ Handles rendering templates, receiving form data, and calling
 battle calculation functions from the simulator module.
 """
 
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect, url_for
 from simulator.calculations import calculate_damage
 from simulator.units import Unit
 from simulator.data_loader import FEHDatabase
@@ -137,54 +137,63 @@ def index():
 
 @main.route("/admin", methods=["GET", "POST"])
 def admin():
-    message = None
     db = FEHDatabase()
     units = db.get_units()
     weapons = db.get_weapons()
     skills = db.get_skills()
-    form_type = request.args.get("type")
+    message = None
     if request.method == "POST":
+        form_type = request.args.get("type")
         if form_type == "unit":
-            superboons = request.form.get("superboons", "")
-            superbanes = request.form.get("superbanes", "")
-            exclusive_skills = request.form.get("exclusive_skills", "")
-            unit = {
-                "name": request.form.get("name"),
-                "hp": int(request.form.get("hp")),
-                "atk": int(request.form.get("atk")),
-                "spd": int(request.form.get("spd")),
-                "defense": int(request.form.get("defense")),
-                "res": int(request.form.get("res")),
-                "superboons": [s.strip() for s in superboons.split(",") if s.strip()],
-                "superbanes": [s.strip() for s in superbanes.split(",") if s.strip()],
-                "exclusive_skills": [s.strip() for s in exclusive_skills.split(",") if s.strip()],
-                "image_url": request.form.get("image_url"),
-                "unit_type": request.form.get("unit_type"),
-                "weapon_type": request.form.get("weapon_type"),
-            }
-            db.add_unit(unit)
-            message = f"Unit '{unit['name']}' added."
+            name = request.form.get("name")
+            # Check for duplicate unit name
+            if any(u['name'].lower() == name.lower() for u in units):
+                message = f"Unit '{name}' already exists."
+            else:
+                unit = {
+                    "name": name,
+                    "hp": int(request.form.get("hp")),
+                    "atk": int(request.form.get("atk")),
+                    "spd": int(request.form.get("spd")),
+                    "defense": int(request.form.get("defense")),
+                    "res": int(request.form.get("res")),
+                    "superboons": [s.strip() for s in request.form.get("superboons", "").split(",") if s.strip()],
+                    "superbanes": [s.strip() for s in request.form.get("superbanes", "").split(",") if s.strip()],
+                    "exclusive_skills": [s.strip() for s in request.form.get("exclusive_skills", "").split(",") if s.strip()],
+                    "image_url": request.form.get("image_url"),
+                    "unit_type": request.form.get("unit_type"),
+                    "weapon_type": request.form.get("weapon_type")
+                }
+                db.add_unit(unit)
+                message = f"Unit '{unit['name']}' added."
         elif form_type == "weapon":
-            effective_against = request.form.getlist("effective_against")
-            weapon = {
-                "name": request.form.get("name"),
-                "might": int(request.form.get("might")),
-                "color": request.form.get("color"),
-                "range": int(request.form.get("range")),
-                "weapon_type": request.form.get("weapon_type"),
-                "effective_against": ",".join(effective_against),
-            }
-            db.add_weapon(weapon)
-            message = f"Weapon '{weapon['name']}' added."
+            name = request.form.get("name")
+            if any(w['name'].lower() == name.lower() for w in weapons):
+                message = f"Weapon '{name}' already exists."
+            else:
+                weapon = {
+                    "name": name,
+                    "might": int(request.form.get("might")),
+                    "color": request.form.get("color"),
+                    "range": int(request.form.get("range")),
+                    "weapon_type": request.form.get("weapon_type"),
+                    "effective_against": request.form.getlist("effective_against")
+                }
+                db.add_weapon(weapon)
+                message = f"Weapon '{weapon['name']}' added."
         elif form_type == "skill":
-            skill = {
-                "name": request.form.get("name"),
-                "description": request.form.get("description"),
-                "skill_type": request.form.get("skill_type"),
-                "effect_json": request.form.get("effect_json"),
-            }
-            db.add_skill(skill)
-            message = f"Skill '{skill['name']}' added."
+            name = request.form.get("name")
+            if any(s['name'].lower() == name.lower() for s in skills):
+                message = f"Skill '{name}' already exists."
+            else:
+                skill = {
+                    "name": name,
+                    "description": request.form.get("description"),
+                    "skill_type": request.form.get("skill_type"),
+                    "effect_json": request.form.get("effect_json")
+                }
+                db.add_skill(skill)
+                message = f"Skill '{skill['name']}' added."
         elif form_type == "delete":
             delete_type = request.form.get("delete_type")
             delete_name = request.form.get("delete_name")
@@ -198,4 +207,50 @@ def admin():
                 db.delete_skill(delete_name)
                 message = f"Skill '{delete_name}' deleted."
     db.close()
-    return render_template("admin.html", message=message, units=units, weapons=weapons, skills=skills)
+    return render_template("admin.html", units=units, weapons=weapons, skills=skills, message=message)
+
+@main.route("/admin/units", methods=["GET"])
+def admin_unit_list():
+    db = FEHDatabase()
+    units = db.get_units()
+    db.close()
+    search = request.args.get('search', '').strip().lower()
+    if search:
+        units = [u for u in units if search in u['name'].lower()]
+    return render_template("unit_list.html", units=units, search=search)
+
+@main.route("/admin/delete/unit/<unit_name>", methods=["POST"])
+def admin_delete_unit(unit_name):
+    db = FEHDatabase()
+    db.delete_unit(unit_name)
+    db.close()
+    return redirect(url_for('main.admin_unit_list'))
+
+@main.route("/admin/edit/unit/<unit_name>", methods=["GET", "POST"])
+def admin_edit_unit(unit_name):
+    db = FEHDatabase()
+    units = db.get_units()
+    unit = next((u for u in units if u['name'] == unit_name), None)
+    message = None
+    if not unit:
+        db.close()
+        return render_template("edit_unit.html", unit=None, message="Unit not found.")
+    if request.method == "POST":
+        # Update unit fields from form
+        unit["name"] = request.form.get("name")
+        unit["hp"] = int(request.form.get("hp"))
+        unit["atk"] = int(request.form.get("atk"))
+        unit["spd"] = int(request.form.get("spd"))
+        unit["defense"] = int(request.form.get("defense"))
+        unit["res"] = int(request.form.get("res"))
+        unit["superboons"] = [s.strip() for s in request.form.get("superboons", "").split(",") if s.strip()]
+        unit["superbanes"] = [s.strip() for s in request.form.get("superbanes", "").split(",") if s.strip()]
+        unit["exclusive_skills"] = [s.strip() for s in request.form.get("exclusive_skills", "").split(",") if s.strip()]
+        unit["image_url"] = request.form.get("image_url")
+        unit["unit_type"] = request.form.get("unit_type")
+        unit["weapon_type"] = request.form.get("weapon_type")
+        db.update_unit(unit_name, unit)
+        message = f"Unit '{unit['name']}' updated."
+        unit_name = unit["name"]
+    db.close()
+    return render_template("edit_unit.html", unit=unit, message=message)
